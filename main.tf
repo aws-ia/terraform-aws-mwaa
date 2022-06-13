@@ -217,23 +217,6 @@ data "aws_iam_policy_document" "mwaa_policy" {
   statement {
     effect = "Allow"
     actions = [
-      "dynamodb:Describe*",
-      "dynamodb:PartiQLSelect",
-      "dynamodb:Get*",
-      "dynamodb:Scan",
-      "dynamodb:Query",
-      "dynamodb:BatchGetItem",
-      "dynamodb:ConditionCheckItem",
-      "dynamodb:List*",
-    ]
-    resources = [
-      "arn:aws:dynamodb:*:${data.aws_caller_identity.current.account_id}:*"
-    ]
-  }
-
-  statement {
-    effect = "Allow"
-    actions = [
       "batch:*",
     ]
     resources = [
