@@ -1,61 +1,75 @@
 <!-- BEGIN_TF_DOCS -->
-# Creating modules for AWS I&A Organization
+# Amazon Managed Workflows for Apache Airflow (MWAA) - Terraform Module
 
-This repo template is used to seed Terraform Module templates for the [AWS I&A GitHub organization](https://github.com/aws-ia). Usage of this template is allowed per included license. PRs to this template will be considered but are not guaranteed to be included. Consider creating an issue to discuss a feature you want to include before taking the time to create a PR.
-### TL;DR
+Terraform module for create an Amazon Managed Workflows for Apache Airflow (MWAA) environment.
+The module will create the following resources:
+ - MWAA Environment
+ - MWAA Service IAM Role and IAM Policy
+ - MWAA S3 Bucket(To Store Dags, Plugins, Requirements.txt file,etc)
+ - MWAA Security Group
 
-1. [install pre-commit](https://pre-commit.com/)
-2. configure pre-commit: `pre-commit install`
-3. install required tools
-    - [tflint](https://github.com/terraform-linters/tflint)
-    - [tfsec](https://aquasecurity.github.io/tfsec/v1.0.11/)
-    - [terraform-docs](https://github.com/terraform-docs/terraform-docs)
-    - [golang](https://go.dev/doc/install) (for macos you can use `brew`)
-    - [coreutils](https://www.gnu.org/software/coreutils/)
+ ## Usage
 
-Write code according to [I&A module standards](https://aws-ia.github.io/standards-terraform/)
+```hcl
+module "mwaa" {
+  source               = "aws-ia/mwaa/aws"
+  environment_name     = "mwaa-dev"
+  airflow_version      = "2.2.2"
+  environment_class    = "mw1.medium"
+  dag_s3_path          = "dags"
+  plugins_s3_path      = "plugins.zip"
+  requirements_s3_path = "dags/requirements.txt"
+  logging_configuration = {
+    "dag_processing_logs" = {
+      enabled   = true
+      log_level = "INFO"
+    }
 
-## Module Documentation
+    "scheduler_logs" = {
+      enabled   = true
+      log_level = "INFO"
+    }
 
-**Do not manually update README.md**. `terraform-docs` is used to generate README files. For any instructions an content, please update [.header.md](./.header.md) then simply run `terraform-docs ./` or allow the `pre-commit` to do so.
+    "task_logs" = {
+      enabled   = true
+      log_level = "INFO"
+    }
 
-## Terratest
+    "webserver_logs" = {
+      enabled   = true
+      log_level = "INFO"
+    }
 
-Please include tests to validate your examples/<> root modules, at a minimum. This can be accomplished with usually only slight modifications to the [boilerplate test provided in this template](./test/examples\_basic\_test.go)
-
-### Configure and run Terratest
-
-1. Install
-
-    [golang](https://go.dev/doc/install) (for macos you can use `brew`)
-2. Change directory into the test folder.
-    
-    `cd test`
-3. Initialize your test
-    
-    go mod init github.com/[github org]/[repository]
-
-    `go mod init github.com/aws-ia/terraform-aws-vpc`
-4. Run tidy
-
-    `git mod tidy`
-5. Install Terratest
-
-    `go get github.com/gruntwork-io/terratest/modules/terraform`
-6. Run test (You can have multiple test files).
-    - Run all tests
-
-        `go test`
-    - Run a specific test with a timeout
-
-        `go test -run examples_basic_test.go -timeout 45m`
-## Module Standards
-
-For best practices and information on developing with Terraform, see the [I&A Module Standards](https://aws-ia.github.io/standards-terraform/)
-
-## Continuous Integration
-
-The I&A team uses AWS CodeBuild to perform continuous integration (CI) within the organization. Our CI uses the a repo's `.pre-commit-config.yaml` file as well as some other checks. All PRs with other CI will be rejected. See our [FAQ](https://aws-ia.github.io/standards-terraform/faq/#are-modules-protected-by-ci-automation) for more details.
+    "worker_logs" = {
+      enabled   = true
+      log_level = "INFO"
+    }
+  }
+  airflow_configuration_options = {
+    "core.default_task_retries"         = 3
+    "celery.worker_autoscale"           = "5,5"
+    "core.check_slas"                   = "false"
+    "core.dag_concurrency"              = 96
+    "core.dag_file_processor_timeout"   = 600
+    "core.dagbag_import_timeout"        = 600
+    "core.max_active_runs_per_dag"      = 32
+    "core.parallelism"                  = 64
+    "scheduler.processor_poll_interval" = 15
+    log_level                           = "INFO"
+    dag_timeout                         = 480
+    "webserver_timeout" = {
+      master = 480
+      worker = 480
+    }
+  }
+  min_workers           = 1
+  max_workers           = 25
+  vpc_id                = "VPC-XXXXX"
+  private_subnet_ids    = ["subnet-XXXXXX", "subnet-XXXXXX"]
+  webserver_access_mode = "PUBLIC_ONLY"
+  source_cidr           = ["10.0.0.0/16"] #Add your IP here to access Airflow UI
+}
+```
 
 ## Requirements
 
