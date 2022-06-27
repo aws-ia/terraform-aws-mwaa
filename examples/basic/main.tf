@@ -7,6 +7,11 @@ provider "aws" {
   region = var.region
 }
 
+data "aws_availability_zones" "available" {}
+
+locals {
+  azs = slice(data.aws_availability_zones.available.names, 0, 2)
+}
 #-----------------------------------------------------------
 # NOTE: MWAA Airflow environment takes minimum of 20 mins
 #-----------------------------------------------------------
@@ -63,12 +68,33 @@ module "mwaa" {
   }
   min_workers           = 1
   max_workers           = 25
-  vpc_id                = var.vpc_id
-  private_subnet_ids    = var.private_subnet_ids
+  vpc_id                = module.vpc.vpc_id
+  private_subnet_ids    = module.vpc.private_subnets
   webserver_access_mode = "PUBLIC_ONLY"   # Change this to PRIVATE_ONLY for production environments
   source_cidr           = ["10.1.0.0/16"] # Add your IP here to access Airflow UI
 
   # create_security_group = true # change to to `false` to bring your sec group using `security_group_ids`
   # source_bucket_arn = "<ENTER_S3_BUCKET_ARN>" # Module creates a new S3 bucket if `source_bucket_arn` is not specified
   # execution_role_arn = "<ENTER_YOUR_IAM_ROLE_ARN>" # Module creates a new IAM role if `execution_role_arn` is not specified
+}
+
+#---------------------------------------------------------------
+# Supporting Resources
+#---------------------------------------------------------------
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 3.0"
+
+  name = var.name
+  cidr = var.vpc_cidr
+
+  azs             = local.azs
+  public_subnets  = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 8, k)]
+  private_subnets = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 8, k + 10)]
+
+  enable_nat_gateway   = true
+  single_nat_gateway   = true
+  enable_dns_hostnames = true
+
+  tags = var.tags
 }

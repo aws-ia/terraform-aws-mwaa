@@ -166,7 +166,7 @@ resource "aws_s3_object" "python_requirements" {
 # MWAA Security Group
 # ---------------------------------------------------------------------------------------------------------------------
 resource "aws_security_group" "mwaa" {
-  count = var.create_security_group == true && var.vpc_id != null ? 1 : 0
+  count = var.create_security_group == true ? 1 : 0
 
   name_prefix = "mwaa-"
   description = "Security group for MWAA environment"
@@ -180,7 +180,7 @@ resource "aws_security_group" "mwaa" {
 }
 
 resource "aws_security_group_rule" "mwaa_sg_inbound" {
-  count = var.create_security_group == true && var.vpc_id != null ? 1 : 0
+  count = var.create_security_group == true ? 1 : 0
 
   type                     = "ingress"
   from_port                = 0
@@ -205,7 +205,7 @@ resource "aws_security_group_rule" "mwaa_sg_inbound_vpn" {
 
 #tfsec:ignore:AWS007
 resource "aws_security_group_rule" "mwaa_sg_outbound" {
-  count = var.create_security_group == true && var.vpc_id != null ? 1 : 0
+  count = var.create_security_group == true ? 1 : 0
 
   type              = "egress"
   from_port         = 0

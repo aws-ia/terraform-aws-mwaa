@@ -1,62 +1,79 @@
-<!-- BEGIN_TF_DOCS -->
-# Creating modules for AWS I&A Organization
+# Amazon Managed Workflows for Apache Airflow(MWAA) Module
 
-This repo template is used to seed Terraform Module templates for the [AWS I&A GitHub organization](https://github.com/aws-ia). Usage of this template is allowed per included license. PRs to this template will be considered but are not guaranteed to be included. Consider creating an issue to discuss a feature you want to include before taking the time to create a PR.
-### TL;DR
+This terraform module can be used to deploy Amazon Managed Workflows for Apache Airflow(MWAA) environment.
 
-1. [install pre-commit](https://pre-commit.com/)
-2. configure pre-commit: `pre-commit install`
-3. install required tools
-    - [tflint](https://github.com/terraform-linters/tflint)
-    - [tfsec](https://aquasecurity.github.io/tfsec/v1.0.11/)
-    - [terraform-docs](https://github.com/terraform-docs/terraform-docs)
-    - [golang](https://go.dev/doc/install) (for macos you can use `brew`)
-    - [coreutils](https://www.gnu.org/software/coreutils/)
+   ✅ Deployment examples can be found under [examples](https://github.com/aws-ia/terraform-aws-mwaa/tree/main/examples) folder.
 
-Write code according to [I&A module standards](https://aws-ia.github.io/standards-terraform/)
+   ✅ Amazon MWAA documentation for more details about [Amazon MWAA](https://docs.aws.amazon.com/mwaa/index.html)
 
-## Module Documentation
+   ✅ Amazon MWAA for Analytics [Workshop](https://catalog.us-east-1.prod.workshops.aws/workshops/795e88bb-17e2-498f-82d1-2104f4824168/en-US)
 
-**Do not manually update README.md**. `terraform-docs` is used to generate README files. For any instructions an content, please update [.header.md](./.header.md) then simply run `terraform-docs ./` or allow the `pre-commit` to do so.
+# Usage
 
-## Terratest
+The example below builds Amazon MWAA environment with existing VPC and Private Subnets.
+Amazon MWAA supporting resources S3 bucket, IAM role and Security group gets created by this module by default.
+This module allows you to bring your own S3 bucket, IAM role and Security group.
 
-Please include tests to validate your examples/<> root modules, at a minimum. This can be accomplished with usually only slight modifications to the [boilerplate test provided in this template](./test/examples\_basic\_test.go)
 
-### Configure and run Terratest
+```hcl
+module "mwaa" {
+  source = "aws-ia/mwaa/aws"
 
-1. Install
+  name                 = "basic-mwaa"
+  airflow_version      = "2.2.2"
+  environment_class    = "mw1.medium"
 
-    [golang](https://go.dev/doc/install) (for macos you can use `brew`)
-2. Change directory into the test folder.
-    
-    `cd test`
-3. Initialize your test
-    
-    go mod init github.com/[github org]/[repository]
+  vpc_id                = "<ENTER_VPC_ID>"
+  private_subnet_ids    = ["<ENTER_SIBNET_ID1>","<ENTER_SIBNET_ID2>"]
 
-    `go mod init github.com/aws-ia/terraform-aws-vpc`
-4. Run tidy
+  logging_configuration = {
+    dag_processing_logs = {
+      enabled   = true
+      log_level = "INFO"
+    }
 
-    `git mod tidy`
-5. Install Terratest
+    scheduler_logs = {
+      enabled   = true
+      log_level = "INFO"
+    }
 
-    `go get github.com/gruntwork-io/terratest/modules/terraform`
-6. Run test (You can have multiple test files).
-    - Run all tests
+    task_logs = {
+      enabled   = true
+      log_level = "INFO"
+    }
 
-        `go test`
-    - Run a specific test with a timeout
+    webserver_logs = {
+      enabled   = true
+      log_level = "INFO"
+    }
 
-        `go test -run examples_basic_test.go -timeout 45m`
-## Module Standards
+    worker_logs = {
+      enabled   = true
+      log_level = "INFO"
+    }
+  }
+  airflow_configuration_options = {
+    "core.default_task_retries"            = 3
+    "celery.worker_autoscale"              = "5,5"
+    "core.check_slas"                      = "false"
+    "core.dag_concurrency"                 = 96
+    "core.dag_file_processor_timeout"      = 600
+    "core.dagbag_import_timeout"           = 600
+    "core.max_active_runs_per_dag"         = 32
+    "core.parallelism"                     = 64
+    "scheduler.processor_poll_interval"    = 15
+    "logging.logging_level"                = "INFO"
+    "core.dag_file_processor_timeout"      = 120
+    "web_server.web_server_master_timeout" = 480
+    "web_server.web_server_worker_timeout" = 480
+  }
+  min_workers           = 1
+  max_workers           = 25
+  webserver_access_mode = "PUBLIC_ONLY"   # Default PRIVATE_ONLY for production environments
+}
+```
 
-For best practices and information on developing with Terraform, see the [I&A Module Standards](https://aws-ia.github.io/standards-terraform/)
-
-## Continuous Integration
-
-The I&A team uses AWS CodeBuild to perform continuous integration (CI) within the organization. Our CI uses the a repo's `.pre-commit-config.yaml` file as well as some other checks. All PRs with other CI will be rejected. See our [FAQ](https://aws-ia.github.io/standards-terraform/faq/#are-modules-protected-by-ci-automation) for more details.
-
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
 | Name | Version |
@@ -103,8 +120,6 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_name"></a> [name](#input\_name) | (Required) The name of the Apache Airflow MWAA Environment | `string` | n/a | yes |
-| <a name="input_private_subnet_ids"></a> [private\_subnet\_ids](#input\_private\_subnet\_ids) | (Required) The private subnet IDs in which the environment should be created.<br>MWAA requires two subnets. | `list(string)` | n/a | yes |
 | <a name="input_airflow_configuration_options"></a> [airflow\_configuration\_options](#input\_airflow\_configuration\_options) | (Optional) The airflow\_configuration\_options parameter specifies airflow override options. | `any` | `null` | no |
 | <a name="input_airflow_version"></a> [airflow\_version](#input\_airflow\_version) | (Optional) Airflow version of your environment, will be set by default to the latest version that MWAA supports. | `string` | `null` | no |
 | <a name="input_create_security_group"></a> [create\_security\_group](#input\_create\_security\_group) | Create security group for MWAA | `bool` | `true` | no |
@@ -120,18 +135,19 @@ No modules.
 | <a name="input_logging_configuration"></a> [logging\_configuration](#input\_logging\_configuration) | (Optional) The Apache Airflow logs which will be send to Amazon CloudWatch Logs. | `any` | `null` | no |
 | <a name="input_max_workers"></a> [max\_workers](#input\_max\_workers) | (Optional) The maximum number of workers that can be automatically scaled up.<br>Value need to be between 1 and 25. Will be 10 by default | `number` | `10` | no |
 | <a name="input_min_workers"></a> [min\_workers](#input\_min\_workers) | (Optional) The minimum number of workers that you want to run in your environment. Will be 1 by default. | `number` | `1` | no |
+| <a name="input_name"></a> [name](#input\_name) | (Required) The name of the Apache Airflow MWAA Environment | `string` | n/a | yes |
 | <a name="input_plugins_s3_object_version"></a> [plugins\_s3\_object\_version](#input\_plugins\_s3\_object\_version) | (Optional) The plugins.zip file version you want to use. | `string` | `null` | no |
 | <a name="input_plugins_s3_path"></a> [plugins\_s3\_path](#input\_plugins\_s3\_path) | (Optional) The relative path to the plugins.zip file on your Amazon S3 storage bucket. For example, plugins.zip. If a relative path is provided in the request, then plugins\_s3\_object\_version is required. | `string` | `"plugins.zip"` | no |
-| <a name="input_region"></a> [region](#input\_region) | AWS region to host the service | `string` | `null` | no |
+| <a name="input_private_subnet_ids"></a> [private\_subnet\_ids](#input\_private\_subnet\_ids) | (Required) The private subnet IDs in which the environment should be created.<br>MWAA requires two subnets. | `list(string)` | n/a | yes |
 | <a name="input_requirements_s3_object_version"></a> [requirements\_s3\_object\_version](#input\_requirements\_s3\_object\_version) | Optional) The requirements.txt file version you want to use. | `string` | `null` | no |
 | <a name="input_requirements_s3_path"></a> [requirements\_s3\_path](#input\_requirements\_s3\_path) | (Optional) The relative path to the requirements.txt file on your Amazon S3 storage bucket. For example, requirements.txt. If a relative path is provided in the request, then requirements\_s3\_object\_version is required. | `string` | `"requirements.txt"` | no |
 | <a name="input_schedulers"></a> [schedulers](#input\_schedulers) | (Optional) The number of schedulers that you want to run in your environment. | `string` | `null` | no |
 | <a name="input_security_group_ids"></a> [security\_group\_ids](#input\_security\_group\_ids) | Security group IDs for MWAA | `list(string)` | `[]` | no |
 | <a name="input_source_bucket_arn"></a> [source\_bucket\_arn](#input\_source\_bucket\_arn) | (Required) The Amazon Resource Name (ARN) of your Amazon S3 storage bucket. For example, arn:aws:s3:::airflow-mybucketname | `string` | `null` | no |
 | <a name="input_source_bucket_name"></a> [source\_bucket\_name](#input\_source\_bucket\_name) | New bucket will be created with the given name for MWAA | `string` | `null` | no |
-| <a name="input_source_cidr"></a> [source\_cidr](#input\_source\_cidr) | (Required) Source CIDR block which will be allowed on MWAA SG to access Airflow UI | `list(string)` | `[]` | no |
+| <a name="input_source_cidr"></a> [source\_cidr](#input\_source\_cidr) | (Required) Source CIDR block which will be allowed on MWAA SG to access Airflow UI<br>Used only if `create_security_group=true` | `list(string)` | `[]` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) A map of resource tags to associate with the resource | `map(string)` | `{}` | no |
-| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | (Required) VPC ID to deploy the MWAA Environment. Mandatory if `create_security_group=true` | `string` | `null` | no |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | (Required) VPC ID to deploy the MWAA Environment.<br>Mandatory if `create_security_group=true` | `string` | `""` | no |
 | <a name="input_webserver_access_mode"></a> [webserver\_access\_mode](#input\_webserver\_access\_mode) | (Optional) Specifies whether the webserver should be accessible over the internet or via your specified VPC. Possible options: PRIVATE\_ONLY (default) and PUBLIC\_ONLY | `string` | `"PRIVATE_ONLY"` | no |
 | <a name="input_weekly_maintenance_window_start"></a> [weekly\_maintenance\_window\_start](#input\_weekly\_maintenance\_window\_start) | (Optional) Specifies the start date for the weekly maintenance window | `string` | `null` | no |
 
@@ -147,4 +163,4 @@ No modules.
 | <a name="output_mwaa_service_role_arn"></a> [mwaa\_service\_role\_arn](#output\_mwaa\_service\_role\_arn) | The Service Role ARN of the Amazon MWAA Environment |
 | <a name="output_mwaa_status"></a> [mwaa\_status](#output\_mwaa\_status) | The status of the Amazon MWAA Environment |
 | <a name="output_mwaa_webserver_url"></a> [mwaa\_webserver\_url](#output\_mwaa\_webserver\_url) | The webserver URL of the MWAA Environment |
-<!-- END_TF_DOCS -->
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

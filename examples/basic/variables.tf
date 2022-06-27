@@ -16,14 +16,8 @@ variable "tags" {
   type        = map(string)
 }
 
-variable "vpc_id" {
-  description = "VPC Id for MWAA Security groups"
-  default     = "vpc-0a8bc75bb6754df82"
+variable "vpc_cidr" {
+  description = "VPC CIDR for MWAA"
   type        = string
-}
-
-variable "private_subnet_ids" {
-  description = "Private subnet CIDRs for MWAA environment"
-  default     = ["subnet-014a974fbd4d17b5f", "subnet-0df42f1af3be0dc32"]
-  type        = list(string)
+  default     = "10.1.0.0/16"
 }
