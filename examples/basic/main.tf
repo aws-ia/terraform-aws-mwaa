@@ -5,13 +5,14 @@
 #####################################################################################
 
 module "mwaa" {
-  source               = "aws-ia/mwaa/aws"
+  source               = "../../.."
   environment_name     = "mwaa-dev"
   airflow_version      = "2.2.2"
   environment_class    = "mw1.medium"
   dag_s3_path          = "dags"
   plugins_s3_path      = "plugins.zip"
   requirements_s3_path = "dags/requirements.txt"
+
   logging_configuration = {
     "dag_processing_logs" = {
       enabled   = true

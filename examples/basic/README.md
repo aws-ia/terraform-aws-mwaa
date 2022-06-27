@@ -13,7 +13,9 @@ No providers.
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_mwaa"></a> [mwaa](#module\_mwaa) | ../../.. | n/a |
 
 ## Resources
 
