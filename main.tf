@@ -27,34 +27,30 @@ resource "aws_mwaa_environment" "mwaa" {
   weekly_maintenance_window_start = var.weekly_maintenance_window_start
   requirements_s3_object_version  = var.requirements_s3_object_version
 
-  dynamic "logging_configuration" {
-    for_each = var.logging_configuration
+  logging_configuration {
+    dag_processing_logs {
+      enabled   = try(var.logging_configuration.dag_processing_logs.enabled, true)
+      log_level = try(var.logging_configuration.dag_processing_logs.log_level, "DEBUG")
+    }
 
-    content {
-      dag_processing_logs {
-        enabled   = try(var.logging_configuration.dag_processing_logs.enabled, true)
-        log_level = try(var.logging_configuration.dag_processing_logs.log_level, "DEBUG")
-      }
+    scheduler_logs {
+      enabled   = try(var.logging_configuration.scheduler_logs.enabled, true)
+      log_level = try(var.logging_configuration.scheduler_logs.log_level, "INFO")
+    }
 
-      scheduler_logs {
-        enabled   = try(var.logging_configuration.scheduler_logs.enabled, true)
-        log_level = try(var.logging_configuration.scheduler_logs.log_level, "INFO")
-      }
+    task_logs {
+      enabled   = try(var.logging_configuration.task_logs.enabled, true)
+      log_level = try(var.logging_configuration.task_logs.log_level, "WARNING")
+    }
 
-      task_logs {
-        enabled   = try(var.logging_configuration.task_logs.enabled, true)
-        log_level = try(var.logging_configuration.task_logs.log_level, "WARNING")
-      }
+    webserver_logs {
+      enabled   = try(var.logging_configuration.webserver_logs.enabled, true)
+      log_level = try(var.logging_configuration.webserver_logs.log_level, "ERROR")
+    }
 
-      webserver_logs {
-        enabled   = try(var.logging_configuration.webserver_logs.enabled, true)
-        log_level = try(var.logging_configuration.webserver_logs.log_level, "ERROR")
-      }
-
-      worker_logs {
-        enabled   = try(var.logging_configuration.worker_logs.enabled, true)
-        log_level = try(var.logging_configuration.worker_logs.log_level, "CRITICAL")
-      }
+    worker_logs {
+      enabled   = try(var.logging_configuration.worker_logs.enabled, true)
+      log_level = try(var.logging_configuration.worker_logs.log_level, "CRITICAL")
     }
   }
 
@@ -207,6 +203,7 @@ resource "aws_security_group_rule" "mwaa_sg_inbound_vpn" {
   description       = "VPN Access for Airflow UI"
 }
 
+#tfsec:ignore:AWS007
 resource "aws_security_group_rule" "mwaa_sg_outbound" {
   count = var.create_security_group == true && var.vpc_id != null ? 1 : 0
 

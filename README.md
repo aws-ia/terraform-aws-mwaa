@@ -61,7 +61,7 @@ The I&A team uses AWS CodeBuild to perform continuous integration (CI) within th
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.14 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.20.0 |
 
 ## Providers
@@ -103,12 +103,11 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_logging_configuration"></a> [logging\_configuration](#input\_logging\_configuration) | (Optional) The Apache Airflow logs which will be send to Amazon CloudWatch Logs. | `any` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | (Required) The name of the Apache Airflow MWAA Environment | `string` | n/a | yes |
 | <a name="input_private_subnet_ids"></a> [private\_subnet\_ids](#input\_private\_subnet\_ids) | (Required) The private subnet IDs in which the environment should be created.<br>MWAA requires two subnets. | `list(string)` | n/a | yes |
 | <a name="input_airflow_configuration_options"></a> [airflow\_configuration\_options](#input\_airflow\_configuration\_options) | (Optional) The airflow\_configuration\_options parameter specifies airflow override options. | `any` | `null` | no |
 | <a name="input_airflow_version"></a> [airflow\_version](#input\_airflow\_version) | (Optional) Airflow version of your environment, will be set by default to the latest version that MWAA supports. | `string` | `null` | no |
-| <a name="input_create_security_group"></a> [create\_security\_group](#input\_create\_security\_group) | Create security group for MWAA | `bool` | `false` | no |
+| <a name="input_create_security_group"></a> [create\_security\_group](#input\_create\_security\_group) | Create security group for MWAA | `bool` | `true` | no |
 | <a name="input_dag_s3_path"></a> [dag\_s3\_path](#input\_dag\_s3\_path) | (Required) The relative path to the DAG folder on your Amazon S3 storage bucket. For example, dags. | `string` | `"dags"` | no |
 | <a name="input_environment_class"></a> [environment\_class](#input\_environment\_class) | (Optional) Environment class for the cluster. Possible options are mw1.small, mw1.medium, mw1.large.<br>Will be set by default to mw1.small. Please check the AWS Pricing for more information about the environment classes. | `string` | `"mw1.small"` | no |
 | <a name="input_execution_role_arn"></a> [execution\_role\_arn](#input\_execution\_role\_arn) | (Required) The Amazon Resource Name (ARN) of the task execution role that the Amazon MWAA and its environment can assume<br>Mandatory if `create_iam_role=false` | `string` | `null` | no |
@@ -118,6 +117,7 @@ No modules.
 | <a name="input_iam_role_path"></a> [iam\_role\_path](#input\_iam\_role\_path) | IAM role path | `string` | `"/"` | no |
 | <a name="input_iam_role_permissions_boundary"></a> [iam\_role\_permissions\_boundary](#input\_iam\_role\_permissions\_boundary) | IAM role Permission boundary | `string` | `null` | no |
 | <a name="input_kms_key"></a> [kms\_key](#input\_kms\_key) | (Optional) The Amazon Resource Name (ARN) of your KMS key that you want to use for encryption.<br>Will be set to the ARN of the managed KMS key aws/airflow by default. | `string` | `null` | no |
+| <a name="input_logging_configuration"></a> [logging\_configuration](#input\_logging\_configuration) | (Optional) The Apache Airflow logs which will be send to Amazon CloudWatch Logs. | `any` | `null` | no |
 | <a name="input_max_workers"></a> [max\_workers](#input\_max\_workers) | (Optional) The maximum number of workers that can be automatically scaled up.<br>Value need to be between 1 and 25. Will be 10 by default | `number` | `10` | no |
 | <a name="input_min_workers"></a> [min\_workers](#input\_min\_workers) | (Optional) The minimum number of workers that you want to run in your environment. Will be 1 by default. | `number` | `1` | no |
 | <a name="input_plugins_s3_object_version"></a> [plugins\_s3\_object\_version](#input\_plugins\_s3\_object\_version) | (Optional) The plugins.zip file version you want to use. | `string` | `null` | no |
@@ -143,7 +143,7 @@ No modules.
 | <a name="output_mwaa_arn"></a> [mwaa\_arn](#output\_mwaa\_arn) | The ARN of the MWAA Environment |
 | <a name="output_mwaa_role_arn"></a> [mwaa\_role\_arn](#output\_mwaa\_role\_arn) | The ARN of the MWAA Environment |
 | <a name="output_mwaa_role_name"></a> [mwaa\_role\_name](#output\_mwaa\_role\_name) | The ARN of the MWAA Environment |
-| <a name="output_mwaa_security_group"></a> [mwaa\_security\_group](#output\_mwaa\_security\_group) | The ARN of the MWAA Environment |
+| <a name="output_mwaa_security_group_id"></a> [mwaa\_security\_group\_id](#output\_mwaa\_security\_group\_id) | The ARN of the MWAA Environment |
 | <a name="output_mwaa_service_role_arn"></a> [mwaa\_service\_role\_arn](#output\_mwaa\_service\_role\_arn) | The Service Role ARN of the Amazon MWAA Environment |
 | <a name="output_mwaa_status"></a> [mwaa\_status](#output\_mwaa\_status) | The status of the Amazon MWAA Environment |
 | <a name="output_mwaa_webserver_url"></a> [mwaa\_webserver\_url](#output\_mwaa\_webserver\_url) | The webserver URL of the MWAA Environment |

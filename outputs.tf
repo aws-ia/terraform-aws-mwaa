@@ -28,7 +28,7 @@ output "mwaa_role_name" {
   value       = var.execution_role_arn == null ? aws_iam_role.mwaa[0].id : ""
 }
 
-output "mwaa_security_group" {
+output "mwaa_security_group_id" {
   description = "The ARN of the MWAA Environment"
   value       = var.create_security_group == true ? aws_security_group.mwaa[0].id : ""
 }

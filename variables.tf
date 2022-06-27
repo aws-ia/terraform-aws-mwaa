@@ -55,6 +55,7 @@ variable "kms_key" {
 variable "logging_configuration" {
   description = "(Optional) The Apache Airflow logs which will be send to Amazon CloudWatch Logs."
   type        = any
+  default     = null
 }
 
 variable "max_workers" {
@@ -199,7 +200,7 @@ variable "security_group_ids" {
 variable "create_security_group" {
   description = "Create security group for MWAA"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "vpc_id" {
@@ -218,5 +219,4 @@ variable "requirements_s3_object_version" {
   description = "Optional) The requirements.txt file version you want to use."
   type        = string
   default     = null
-
 }
