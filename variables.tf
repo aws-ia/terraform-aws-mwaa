@@ -96,12 +96,6 @@ variable "requirements_s3_path" {
   default     = "requirements.txt"
 }
 
-variable "region" {
-  type        = string
-  description = "AWS region to host the service"
-  default     = null
-}
-
 variable "schedulers" {
   description = "(Optional) The number of schedulers that you want to run in your environment."
   type        = string
@@ -204,13 +198,19 @@ variable "create_security_group" {
 }
 
 variable "vpc_id" {
-  description = "(Required) VPC ID to deploy the MWAA Environment. Mandatory if `create_security_group=true` "
+  description = <<-EOD
+  (Required) VPC ID to deploy the MWAA Environment.
+  Mandatory if `create_security_group=true`
+  EOD
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "source_cidr" {
-  description = "(Required) Source CIDR block which will be allowed on MWAA SG to access Airflow UI"
+  description = <<-EOD
+  (Required) Source CIDR block which will be allowed on MWAA SG to access Airflow UI
+  Used only if `create_security_group=true`
+  EOD
   type        = list(string)
   default     = []
 }
