@@ -1,23 +1,39 @@
 output "mwaa_webserver_url" {
-  value = aws_mwaa_environment.aws_mwaa_environment.webserver_url
+  description = "The webserver URL of the MWAA Environment"
+  value       = aws_mwaa_environment.mwaa.webserver_url
 }
 
 output "mwaa_arn" {
-  value = aws_mwaa_environment.aws_mwaa_environment.arn
+  description = "The ARN of the MWAA Environment"
+  value       = aws_mwaa_environment.mwaa.arn
+}
+
+output "mwaa_service_role_arn" {
+  description = "The Service Role ARN of the Amazon MWAA Environment"
+  value       = aws_mwaa_environment.mwaa.service_role_arn
+}
+
+output "mwaa_status" {
+  description = " The status of the Amazon MWAA Environment"
+  value       = aws_mwaa_environment.mwaa.status
 }
 
 output "mwaa_role_arn" {
-  value = aws_iam_role.mwaa_role.arn
+  description = "The ARN of the MWAA Environment"
+  value       = var.execution_role_arn == null ? aws_iam_role.mwaa[0].arn : ""
 }
 
 output "mwaa_role_name" {
-  value = aws_iam_role.mwaa_role.id
+  description = "The ARN of the MWAA Environment"
+  value       = var.execution_role_arn == null ? aws_iam_role.mwaa[0].id : ""
 }
 
-output "mwaa_security_group" {
-  value = aws_security_group.mwaa_sg.id
+output "mwaa_security_group_id" {
+  description = "The ARN of the MWAA Environment"
+  value       = var.create_security_group == true ? aws_security_group.mwaa[0].id : ""
 }
 
 output "aws_s3_bucket" {
-  value = aws_s3_bucket.mwaa_content.id
+  description = "The ARN of the MWAA Environment"
+  value       = var.source_bucket_arn == null ? aws_s3_bucket.mwaa[0].id : ""
 }

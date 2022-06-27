@@ -1,70 +1,60 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # MWAA Environment
 # ---------------------------------------------------------------------------------------------------------------------
-resource "aws_mwaa_environment" "aws_mwaa_environment" {
-  name              = var.environment_name
+resource "aws_mwaa_environment" "mwaa" {
+  name              = var.name
   airflow_version   = var.airflow_version
   environment_class = var.environment_class
   min_workers       = var.min_workers
   max_workers       = var.max_workers
+  kms_key           = var.kms_key
 
-  execution_role_arn = aws_iam_role.mwaa_role.arn
+  dag_s3_path                   = var.dag_s3_path
+  plugins_s3_object_version     = var.plugins_s3_object_version
+  plugins_s3_path               = var.plugins_s3_path
+  requirements_s3_path          = var.requirements_s3_path
+  schedulers                    = var.schedulers
+  execution_role_arn            = local.execution_role_arn
+  airflow_configuration_options = local.airflow_configuration_options
 
-  airflow_configuration_options = {
-    "core.dagbag_import_timeout"        = var.airflow_configuration_options["dag_timeout"]
-    "core.default_task_retries"         = var.airflow_configuration_options["core.default_task_retries"]
-    "core.check_slas"                   = var.airflow_configuration_options["core.check_slas"]
-    "core.dag_concurrency"              = var.airflow_configuration_options["core.dag_concurrency"]
-    "core.dag_file_processor_timeout"   = var.airflow_configuration_options["core.dag_file_processor_timeout"]
-    "core.dagbag_import_timeout"        = var.airflow_configuration_options["core.dagbag_import_timeout"]
-    "core.max_active_runs_per_dag"      = var.airflow_configuration_options["core.max_active_runs_per_dag"]
-    "core.parallelism"                  = var.airflow_configuration_options["core.parallelism"]
-    "celery.worker_autoscale"           = var.airflow_configuration_options["celery.worker_autoscale"]
-    "scheduler.processor_poll_interval" = var.airflow_configuration_options["scheduler.processor_poll_interval"]
-
-    "logging.logging_level" = var.airflow_configuration_options["log_level"]
-
-    # Airflow webserver timeout
-    "webserver.web_server_master_timeout" = var.airflow_configuration_options["webserver_timeout"]["master"]
-    "webserver.web_server_worker_timeout" = var.airflow_configuration_options["webserver_timeout"]["worker"]
-
+  network_configuration {
+    security_group_ids = local.security_group_ids
+    subnet_ids         = var.private_subnet_ids
   }
+
+  source_bucket_arn               = local.source_bucket_arn
+  webserver_access_mode           = var.webserver_access_mode
+  weekly_maintenance_window_start = var.weekly_maintenance_window_start
+  requirements_s3_object_version  = var.requirements_s3_object_version
 
   logging_configuration {
     dag_processing_logs {
-      enabled   = var.logging_configuration["dag_processing_logs"]["enabled"]
-      log_level = var.logging_configuration["dag_processing_logs"]["log_level"]
+      enabled   = try(var.logging_configuration.dag_processing_logs.enabled, true)
+      log_level = try(var.logging_configuration.dag_processing_logs.log_level, "DEBUG")
     }
 
     scheduler_logs {
-      enabled   = var.logging_configuration["scheduler_logs"]["enabled"]
-      log_level = var.logging_configuration["scheduler_logs"]["log_level"]
+      enabled   = try(var.logging_configuration.scheduler_logs.enabled, true)
+      log_level = try(var.logging_configuration.scheduler_logs.log_level, "INFO")
     }
 
     task_logs {
-      enabled   = var.logging_configuration["task_logs"]["enabled"]
-      log_level = var.logging_configuration["task_logs"]["log_level"]
+      enabled   = try(var.logging_configuration.task_logs.enabled, true)
+      log_level = try(var.logging_configuration.task_logs.log_level, "WARNING")
     }
 
     webserver_logs {
-      enabled   = var.logging_configuration["webserver_logs"]["enabled"]
-      log_level = var.logging_configuration["webserver_logs"]["log_level"]
+      enabled   = try(var.logging_configuration.webserver_logs.enabled, true)
+      log_level = try(var.logging_configuration.webserver_logs.log_level, "ERROR")
     }
 
     worker_logs {
-      enabled   = var.logging_configuration["worker_logs"]["enabled"]
-      log_level = var.logging_configuration["worker_logs"]["log_level"]
+      enabled   = try(var.logging_configuration.worker_logs.enabled, true)
+      log_level = try(var.logging_configuration.worker_logs.log_level, "CRITICAL")
     }
   }
 
-  dag_s3_path          = var.dag_s3_path
-  plugins_s3_path      = var.plugins_s3_path
-  requirements_s3_path = var.requirements_s3_path
-
-  network_configuration {
-    security_group_ids = [aws_security_group.mwaa_sg.id]
-    subnet_ids         = var.private_subnet_ids
-  }
+  tags = var.tags
 
   lifecycle {
     ignore_changes = [
@@ -72,265 +62,156 @@ resource "aws_mwaa_environment" "aws_mwaa_environment" {
       requirements_s3_object_version
     ]
   }
-
-  source_bucket_arn     = aws_s3_bucket.mwaa_content.arn
-  webserver_access_mode = var.webserver_access_mode
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
-# MWAA Role
+# IAM Role
 # ---------------------------------------------------------------------------------------------------------------------
-data "aws_iam_policy_document" "mwaa_assume_role" {
-  statement {
-    actions = ["sts:AssumeRole"]
+resource "aws_iam_role" "mwaa" {
+  count = var.execution_role_arn != null ? 0 : 1
 
-    principals {
-      type        = "Service"
-      identifiers = ["airflow.amazonaws.com"]
-    }
+  name                  = var.iam_role_name != null ? var.iam_role_name : null
+  name_prefix           = var.iam_role_name != null ? null : "mwaa-executor"
+  description           = "MWAA IAM Role"
+  assume_role_policy    = data.aws_iam_policy_document.mwaa_assume.json
+  force_detach_policies = var.force_detach_policies
+  path                  = var.iam_role_path
+  permissions_boundary  = var.iam_role_permissions_boundary
 
-    principals {
-      type        = "Service"
-      identifiers = ["airflow-env.amazonaws.com"]
-    }
-
-    principals {
-      type        = "Service"
-      identifiers = ["batch.amazonaws.com"]
-    }
-
-    principals {
-      type        = "Service"
-      identifiers = ["ssm.amazonaws.com"]
-    }
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-    principals {
-      type        = "Service"
-      identifiers = ["s3.amazonaws.com"]
-    }
-  }
+  tags = var.tags
 }
 
-resource "aws_iam_role" "mwaa_role" {
-  name               = "mwaa-executor-${var.environment_name}-${data.aws_region.current.name}"
-  assume_role_policy = data.aws_iam_policy_document.mwaa_assume_role.json
+resource "aws_iam_role_policy" "mwaa" {
+  count = var.execution_role_arn != null ? 0 : 1
+
+  name_prefix = "mwaa-executor"
+  role        = aws_iam_role.mwaa[0].id
+  policy      = data.aws_iam_policy_document.mwaa.json
 }
 
-resource "aws_iam_role_policy" "mwaa_policy" {
-  name   = "mwaa-executor-policy-${var.environment_name}-${data.aws_region.current.name}"
-  role   = aws_iam_role.mwaa_role.id
-  policy = data.aws_iam_policy_document.mwaa_policy.json
-}
-
-data "aws_iam_policy_document" "mwaa_policy" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "airflow:PublishMetrics",
-      "airflow:CreateWebLoginToken"
-    ]
-    resources = [
-      "arn:aws:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:environment/${var.environment_name}"
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:*"
-    ]
-    resources = [
-      "arn:aws:s3:::${aws_s3_bucket.mwaa_content.bucket}",
-      "arn:aws:s3:::${aws_s3_bucket.mwaa_content.bucket}/*"
-    ]
-  }
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogStream",
-      "logs:CreateLogGroup",
-      "logs:PutLogEvents",
-      "logs:GetLogEvents",
-      "logs:GetLogRecord",
-      "logs:GetLogGroupFields",
-      "logs:GetQueryResults"
-    ]
-    resources = [
-      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:airflow-${var.environment_name}-*"
-    ]
-  }
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "logs:DescribeLogGroups",
-      "cloudwatch:PutMetricData",
-      "batch:DescribeJobs",
-      "batch:ListJobs",
-      "eks:*"
-    ]
-    resources = [
-      "*"
-    ]
-  }
-
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "sqs:ChangeMessageVisibility",
-      "sqs:DeleteMessage",
-      "sqs:GetQueueAttributes",
-      "sqs:GetQueueUrl",
-      "sqs:ReceiveMessage",
-      "sqs:SendMessage"
-    ]
-    resources = [
-      "arn:aws:sqs:${data.aws_region.current.name}:*:airflow-celery-*"
-    ]
-  }
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "kms:Decrypt",
-      "kms:DescribeKey",
-      "kms:GenerateDataKey*",
-      "kms:Encrypt"
-    ]
-    not_resources = [
-      "arn:aws:kms:*:${data.aws_caller_identity.current.account_id}:key/*"
-    ]
-    condition {
-      test     = "StringLike"
-      variable = "kms:ViaService"
-
-      values = [
-        "sqs.${data.aws_region.current.name}.amazonaws.com"
-      ]
-    }
-  }
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "batch:*",
-    ]
-    resources = [
-      "arn:aws:batch:*:${data.aws_caller_identity.current.account_id}:*"
-    ]
-  }
-
-  # Policy to grant acces to SSM
-  statement {
-    effect = "Allow"
-    actions = [
-      "ssm:*"
-    ]
-    resources = [
-      "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/*"
-    ]
-  }
-
-  # Policy to grant access to LogEvents
-  statement {
-    effect = "Allow"
-    actions = [
-      "logs:*"
-    ]
-    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/*"]
-  }
-
-  # Policy to grant access to CloudWatch
-  statement {
-    effect    = "Allow"
-    actions   = ["cloudwatch:*"]
-    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/*"]
-  }
+resource "aws_iam_role_policy_attachment" "mwaa" {
+  for_each   = local.iam_role_additional_policies
+  policy_arn = each.key
+  role       = aws_iam_role.mwaa[0].id
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
 # MWAA S3 Bucket
 # ---------------------------------------------------------------------------------------------------------------------
+#tfsec:ignore:AWS017
+#tfsec:ignore:AWS002
+#tfsec:ignore:AWS077
+resource "aws_s3_bucket" "mwaa" {
+  count = var.source_bucket_arn != null ? 0 : 1
 
-# Amazon MWAA constraints
-#  - S3 bucket needs to start with prefix "airflow"
-#  - Mandatory to set Block Public Access
-resource "aws_s3_bucket" "mwaa_content" {
-  bucket = "mwaa-${var.environment_name}-${data.aws_region.current.name}"
+  bucket_prefix = var.source_bucket_name != null ? var.source_bucket_name : format("%s-%s-", "mwaa", data.aws_caller_identity.current.account_id)
+  tags          = var.tags
 }
 
-resource "aws_s3_bucket_acl" "mwaa_content" {
-  bucket = aws_s3_bucket.mwaa_content.id
+resource "aws_s3_bucket_acl" "mwaa" {
+  count = var.source_bucket_arn != null ? 0 : 1
+
+  bucket = aws_s3_bucket.mwaa[0].id
   acl    = "private"
 }
 
-resource "aws_s3_bucket_versioning" "mwaa_content" {
-  bucket = aws_s3_bucket.mwaa_content.id
+resource "aws_s3_bucket_server_side_encryption_configuration" "mwaa" {
+  count = var.source_bucket_arn != null ? 0 : 1
+
+  bucket = aws_s3_bucket.mwaa[0].id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "mwaa" {
+  count = var.source_bucket_arn != null ? 0 : 1
+
+  bucket = aws_s3_bucket.mwaa[0].id
+
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "mwaa_public_access_block" {
-  bucket = aws_s3_bucket.mwaa_content.id
+resource "aws_s3_bucket_public_access_block" "mwaa" {
+  count = var.source_bucket_arn != null ? 0 : 1
 
-  block_public_acls   = true
-  block_public_policy = true
+  bucket = aws_s3_bucket.mwaa[0].id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  restrict_public_buckets = true
+  ignore_public_acls      = true
 }
 
 resource "aws_s3_object" "plugins" {
+  count = var.source_bucket_arn != null ? 0 : 1
+
   key    = "plugins.zip"
-  bucket = aws_s3_bucket.mwaa_content.id
+  bucket = aws_s3_bucket.mwaa[0].id
 }
 
 resource "aws_s3_object" "python_requirements" {
+  count = var.source_bucket_arn != null ? 0 : 1
+
   key    = "requirements.txt"
-  bucket = aws_s3_bucket.mwaa_content.id
-}
-
-resource "aws_security_group" "mwaa_sg" {
-  name   = "mwaa-${var.environment_name}"
-  vpc_id = var.vpc_id
-
-  lifecycle {
-    create_before_destroy = true
-  }
+  bucket = aws_s3_bucket.mwaa[0].id
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
 # MWAA Security Group
 # ---------------------------------------------------------------------------------------------------------------------
+resource "aws_security_group" "mwaa" {
+  count = var.create_security_group == true && var.vpc_id != null ? 1 : 0
+
+  name_prefix = "mwaa-"
+  description = "Security group for MWAA environment"
+  vpc_id      = var.vpc_id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = var.tags
+}
 
 resource "aws_security_group_rule" "mwaa_sg_inbound" {
+  count = var.create_security_group == true && var.vpc_id != null ? 1 : 0
+
   type                     = "ingress"
   from_port                = 0
   to_port                  = 0
   protocol                 = "all"
-  source_security_group_id = aws_security_group.mwaa_sg.id
-  security_group_id        = aws_security_group.mwaa_sg.id
+  source_security_group_id = aws_security_group.mwaa[0].id
+  security_group_id        = aws_security_group.mwaa[0].id
   description              = "Amazon MWAA inbound access"
 }
 
 resource "aws_security_group_rule" "mwaa_sg_inbound_vpn" {
+  count = var.create_security_group == true && length(var.source_cidr) > 0 ? 1 : 0
+
   type              = "ingress"
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = tolist(var.source_cidr)
-  security_group_id = aws_security_group.mwaa_sg.id
+  cidr_blocks       = var.source_cidr
+  security_group_id = aws_security_group.mwaa[0].id
   description       = "VPN Access for Airflow UI"
 }
 
+#tfsec:ignore:AWS007
 resource "aws_security_group_rule" "mwaa_sg_outbound" {
+  count = var.create_security_group == true && var.vpc_id != null ? 1 : 0
+
   type              = "egress"
   from_port         = 0
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.mwaa_sg.id
+  security_group_id = aws_security_group.mwaa[0].id
   description       = "Amazon MWAA outbound access"
 }
