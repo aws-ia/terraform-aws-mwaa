@@ -92,20 +92,27 @@ aws s3 cp hello_world_dag.py s3://{your_s3_bucket}/dags/
 
 Once the DAG has been copied, it might take 2-3 minutes before you see the DAG appear in the Apache Airflow UI.
 
-![example DAGs in Apache Airflow UI](../../images/mwaa-dag-ui.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/aws-ia/terraform-aws-mwaa/main/images/mwaa-dag-ui.png" alt="example DAGs in Apache Airflow UI" width="100%">
+</p>
 
 By default, it will be disabled (paused) but you can enable it and it should then run.
 
-![viewing the DAG running](../../images/mwaa-dag-running.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/aws-ia/terraform-aws-mwaa/main/images/mwaa-dag-running.png" alt="viewing the DAG running" width="100%">
+</p>
 
 Check the status of the task, and view the logs to make sure you get the expected output.
 
-![viewing the DAG log files in Apache Airflow UI](../../images/mwaa-example-log.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/aws-ia/terraform-aws-mwaa/main/images/mwaa-example-log.png" alt="viewing the DAG log files in Apache Airflow UI" width="100%">
+</p>
 
 You can additionally check the MWAA environment CloudWatch logs to make sure that these have all been created and that you can view output generated as part of this workflow.
 
-![look at the CloudWatch log groups created](../../images/mwaa-cloudwatch-loggroup.png)
-
+<p align="center">
+  <img src="https://raw.githubusercontent.com/aws-ia/terraform-aws-mwaa/main/images/mwaa-cloudwatch-loggroup.png" alt="look at the CloudWatch log groups created" width="100%">
+</p>
 
 ## Cleanup
 To clean up your environment, destroy the Terraform module.

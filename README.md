@@ -10,7 +10,9 @@ This terraform module can be used to deploy [Amazon Managed Workflows for Apache
 
 ## Amazon MWAA Architecture
 
-![example of Amazon MWAA Architecture for an example public deployment](images/mwaa-architecture-iac.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/aws-ia/terraform-aws-mwaa/main/images/mwaa-architecture-iac.png" alt="Amazon MWAA Architecture for an example public deployment" width="100%">
+</p>
 
 ## Usage
 
