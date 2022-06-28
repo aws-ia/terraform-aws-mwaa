@@ -1,17 +1,21 @@
 # Amazon Managed Workflows for Apache Airflow(MWAA) Module
 
-This terraform module can be used to deploy Amazon Managed Workflows for Apache Airflow(MWAA) environment.
+This terraform module can be used to deploy [Amazon Managed Workflows for Apache Airflow(MWAA)](https://docs.aws.amazon.com/mwaa/latest/userguide/what-is-mwaa.html) environment.
 
    ✅ Deployment examples can be found under [examples](https://github.com/aws-ia/terraform-aws-mwaa/tree/main/examples) folder.
 
    ✅ Amazon MWAA documentation for more details about [Amazon MWAA](https://docs.aws.amazon.com/mwaa/index.html)
 
    ✅ Amazon MWAA for Analytics [Workshop](https://catalog.us-east-1.prod.workshops.aws/workshops/795e88bb-17e2-498f-82d1-2104f4824168/en-US)
+   
+## Amazon MWAA Architecture
 
-# Usage
+![example of Amazon MWAA Architecture for an example public deployment](images/mwaa-architecture-terraform-iac.png)
+
+## Usage
 
 The example below builds Amazon MWAA environment with existing VPC and Private Subnets.
-Amazon MWAA supporting resources S3 bucket, IAM role and Security group gets created by this module by default.
+Amazon MWAA supporting resources S3 bucket, IAM role and Security groups created by this module by default.
 This module allows you to bring your own S3 bucket, IAM role and Security group.
 
 ```hcl
@@ -55,9 +59,13 @@ module "mwaa" {
       log_level = "INFO"
     }
   }
+  
   airflow_configuration_options = {
-    "core.default_task_retries"            = 3
-    "logging.logging_level"                = "INFO"
+    "core.load_default_connections" = "false"
+    "core.load_examples"            = "false"
+    "webserver.dag_default_view"    = "tree"
+    "webserver.dag_orientation"     = "TB"
+    "logging.logging_level"         = "INFO"
   }
 }
 ```
