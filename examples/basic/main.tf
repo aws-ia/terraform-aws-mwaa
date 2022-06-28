@@ -73,7 +73,7 @@ module "mwaa" {
   private_subnet_ids = module.vpc.private_subnets
 
   webserver_access_mode = "PUBLIC_ONLY"   # Choose the Private network option(PRIVATE_ONLY) if your Apache Airflow UI is only accessed within a corporate network, and you do not require access to public repositories for web server requirements installation
-  source_cidr           = ["10.1.0.0/16"] # Add your IP here to access Airflow UI
+  source_cidr           = ["10.1.0.0/16"] # Add your IP address to access Airflow UI
 
   # create_security_group = true # change to to `false` to bring your sec group using `security_group_ids`
   # source_bucket_arn = "<ENTER_S3_BUCKET_ARN>" # Module creates a new S3 bucket if `source_bucket_arn` is not specified

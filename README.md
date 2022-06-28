@@ -14,7 +14,6 @@ The example below builds Amazon MWAA environment with existing VPC and Private S
 Amazon MWAA supporting resources S3 bucket, IAM role and Security group gets created by this module by default.
 This module allows you to bring your own S3 bucket, IAM role and Security group.
 
-
 ```hcl
 module "mwaa" {
   source = "aws-ia/mwaa/aws"
@@ -25,6 +24,10 @@ module "mwaa" {
 
   vpc_id                = "<ENTER_VPC_ID>"
   private_subnet_ids    = ["<ENTER_SIBNET_ID1>","<ENTER_SIBNET_ID2>"]
+
+  min_workers           = 1
+  max_workers           = 25
+  webserver_access_mode = "PUBLIC_ONLY" # Default PRIVATE_ONLY for production environments
 
   logging_configuration = {
     dag_processing_logs = {
@@ -54,22 +57,8 @@ module "mwaa" {
   }
   airflow_configuration_options = {
     "core.default_task_retries"            = 3
-    "celery.worker_autoscale"              = "5,5"
-    "core.check_slas"                      = "false"
-    "core.dag_concurrency"                 = 96
-    "core.dag_file_processor_timeout"      = 600
-    "core.dagbag_import_timeout"           = 600
-    "core.max_active_runs_per_dag"         = 32
-    "core.parallelism"                     = 64
-    "scheduler.processor_poll_interval"    = 15
     "logging.logging_level"                = "INFO"
-    "core.dag_file_processor_timeout"      = 120
-    "web_server.web_server_master_timeout" = 480
-    "web_server.web_server_worker_timeout" = 480
   }
-  min_workers           = 1
-  max_workers           = 25
-  webserver_access_mode = "PUBLIC_ONLY"   # Default PRIVATE_ONLY for production environments
 }
 ```
 
@@ -163,11 +152,11 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_aws_s3_bucket"></a> [aws\_s3\_bucket](#output\_aws\_s3\_bucket) | The ARN of the MWAA Environment |
+| <a name="output_aws_s3_bucket_name"></a> [aws\_s3\_bucket\_name](#output\_aws\_s3\_bucket\_name) | S3 bucket Name of the MWAA Environment |
 | <a name="output_mwaa_arn"></a> [mwaa\_arn](#output\_mwaa\_arn) | The ARN of the MWAA Environment |
-| <a name="output_mwaa_role_arn"></a> [mwaa\_role\_arn](#output\_mwaa\_role\_arn) | The ARN of the MWAA Environment |
-| <a name="output_mwaa_role_name"></a> [mwaa\_role\_name](#output\_mwaa\_role\_name) | The ARN of the MWAA Environment |
-| <a name="output_mwaa_security_group_id"></a> [mwaa\_security\_group\_id](#output\_mwaa\_security\_group\_id) | The ARN of the MWAA Environment |
+| <a name="output_mwaa_role_arn"></a> [mwaa\_role\_arn](#output\_mwaa\_role\_arn) | IAM Role ARN of the MWAA Environment |
+| <a name="output_mwaa_role_name"></a> [mwaa\_role\_name](#output\_mwaa\_role\_name) | IAM role name of the MWAA Environment |
+| <a name="output_mwaa_security_group_id"></a> [mwaa\_security\_group\_id](#output\_mwaa\_security\_group\_id) | Security group id of the MWAA Environment |
 | <a name="output_mwaa_service_role_arn"></a> [mwaa\_service\_role\_arn](#output\_mwaa\_service\_role\_arn) | The Service Role ARN of the Amazon MWAA Environment |
 | <a name="output_mwaa_status"></a> [mwaa\_status](#output\_mwaa\_status) | The status of the Amazon MWAA Environment |
 | <a name="output_mwaa_webserver_url"></a> [mwaa\_webserver\_url](#output\_mwaa\_webserver\_url) | The webserver URL of the MWAA Environment |
