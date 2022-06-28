@@ -87,13 +87,13 @@ variable "plugins_s3_object_version" {
 variable "plugins_s3_path" {
   description = "(Optional) The relative path to the plugins.zip file on your Amazon S3 storage bucket. For example, plugins.zip. If a relative path is provided in the request, then plugins_s3_object_version is required."
   type        = string
-  default     = "plugins.zip"
+  default     = null
 }
 
 variable "requirements_s3_path" {
   description = "(Optional) The relative path to the requirements.txt file on your Amazon S3 storage bucket. For example, requirements.txt. If a relative path is provided in the request, then requirements_s3_object_version is required."
   type        = string
-  default     = "requirements.txt"
+  default     = null
 }
 
 variable "schedulers" {
