@@ -64,6 +64,51 @@ Changes to Outputs:
 
 Open the output URL(`mwaa_webserver_url`) from a browser to verify the Amazon MWAA
 
+#### Step 6: Verify the Amazon MWAA using the sample Apache Airflow workflow
+
+In the dags folder you will have a simple DAG file (hello_world_dag.py) which you can use to test your MWAA environment. This is a very simple workflow that has two tasks that use the BashOperator to echo out a simple string.
+
+**Terraform generated S3 bucket**
+
+Copy this file using the AWS cli using the following command, replacing the {mwaa_dags_folder} with the name of your MWAA environment's S3 bucket.
+
+```
+cd dags
+aws s3 cp hello_world_dag.py s3://{mwaa_dags_folder/dags/}
+```
+
+**Bring your own S3 bucket**
+
+If you provided an S3 bucket arn to be used during the configuration of the MWAA environment, then use the following command to copy the sample dag.
+
+```
+cd dags
+aws s3 cp hello_world_dag.py s3://{your_s3_bucket}/dags/}
+```
+
+> **Note!** in the above examples, this assumes that you defined the MWAA dags folder to be "dags" (which is the default) so if you changed that, please change the /dags/ to whatever you configured that to be.
+>
+
+Once the DAG has been copied, it might take 2-3 minutes before you see the DAG appear in the Apache Airflow UI. 
+
+![example DAGs in Apache Airflow UI](../../images/mwaa-dag-ui.png)
+
+By default, it will be disabled (paused) but you can enable it and it should then run.
+
+![viewing the DAG running](../../images/mwaa-dag-running.png)
+
+Check the status of the task, and view the logs to make sure you get the expected output.
+
+![viewing the DAG log files in Apache Airflow UI](../../images/mwaa-example-log.png)
+
+You can additionally check the MWAA environment CloudWatch logs to make sure that these have all been created and that you can view output generated as part of this workflow.
+
+![look at the CloudWatch log groups created](../../images/mwaa-cloudwatch-loggroup.png)
+
+
+
+
+
 ## Cleanup
 To clean up your environment, destroy the Terraform module.
 
