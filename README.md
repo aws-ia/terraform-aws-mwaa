@@ -8,6 +8,8 @@ This terraform module can be used to deploy Amazon Managed Workflows for Apache 
 
    ✅ Amazon MWAA for Analytics [Workshop](https://catalog.us-east-1.prod.workshops.aws/workshops/795e88bb-17e2-498f-82d1-2104f4824168/en-US)
 
+![example of MWAA Architecture for an example public deployment](images/mwaa-architecture-terraform-iac.png)
+
 # Usage
 
 The example below builds Amazon MWAA environment with existing VPC and Private Subnets.
@@ -52,21 +54,13 @@ module "mwaa" {
       log_level = "INFO"
     }
   }
-  airflow_configuration_options = {
-    "core.default_task_retries"            = 3
-    "celery.worker_autoscale"              = "5,5"
-    "core.check_slas"                      = "false"
-    "core.dag_concurrency"                 = 96
-    "core.dag_file_processor_timeout"      = 600
-    "core.dagbag_import_timeout"           = 600
-    "core.max_active_runs_per_dag"         = 32
-    "core.parallelism"                     = 64
-    "scheduler.processor_poll_interval"    = 15
-    "logging.logging_level"                = "INFO"
-    "core.dag_file_processor_timeout"      = 120
-    "web_server.web_server_master_timeout" = 480
-    "web_server.web_server_worker_timeout" = 480
+    airflow_configuration_options = {
+    "core.load_default_connections" = "false"
+    "core.load_examples" = "false"
+    "webserver.dag_default_view" = "tree"
+    "webserver.dag_orientation" = "TB"
   }
+  
   min_workers           = 1
   max_workers           = 25
   webserver_access_mode = "PUBLIC_ONLY"   # Default PRIVATE_ONLY for production environments
