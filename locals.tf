@@ -6,19 +6,7 @@ locals {
   source_bucket_arn = var.source_bucket_arn != null ? var.source_bucket_arn : aws_s3_bucket.mwaa[0].arn
 
   default_airflow_configuration_options = {
-    "core.default_task_retries"            = 3
-    "celery.worker_autoscale"              = "5,5"
-    "core.check_slas"                      = "false"
-    "core.dag_concurrency"                 = 96
-    "core.dag_file_processor_timeout"      = 600
-    "core.dagbag_import_timeout"           = 600
-    "core.max_active_runs_per_dag"         = 32
-    "core.parallelism"                     = 64
-    "scheduler.processor_poll_interval"    = 15
-    "logging.logging_level"                = "INFO"
-    "core.dag_file_processor_timeout"      = 120
-    "web_server.web_server_master_timeout" = 480
-    "web_server.web_server_worker_timeout" = 480
+    "logging.logging_level" = "INFO"
   }
 
   airflow_configuration_options = merge(local.default_airflow_configuration_options, var.airflow_configuration_options)

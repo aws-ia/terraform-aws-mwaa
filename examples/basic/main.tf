@@ -51,7 +51,8 @@ module "mwaa" {
       log_level = "INFO"
     }
   }
-  airflow_configuration_options = {
+
+  airflow_configuration_options = { # Checkout the suggested Airflow configurations under https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-env-variables.html
     "core.default_task_retries"            = 3
     "celery.worker_autoscale"              = "5,5"
     "core.check_slas"                      = "false"
@@ -66,12 +67,13 @@ module "mwaa" {
     "web_server.web_server_master_timeout" = 480
     "web_server.web_server_worker_timeout" = 480
   }
-  min_workers           = 1
-  max_workers           = 25
-  vpc_id                = module.vpc.vpc_id
-  private_subnet_ids    = module.vpc.private_subnets
-  webserver_access_mode = "PUBLIC_ONLY"   # Change this to PRIVATE_ONLY for production environments
-  source_cidr           = ["10.1.0.0/16"] # Add your IP here to access Airflow UI
+  min_workers        = 1
+  max_workers        = 25
+  vpc_id             = module.vpc.vpc_id
+  private_subnet_ids = module.vpc.private_subnets
+
+  webserver_access_mode = "PUBLIC_ONLY"   # Choose the Private network option(PRIVATE_ONLY) if your Apache Airflow UI is only accessed within a corporate network, and you do not require access to public repositories for web server requirements installation
+  source_cidr           = ["10.1.0.0/16"] # Add your IP address to access Airflow UI
 
   # create_security_group = true # change to to `false` to bring your sec group using `security_group_ids`
   # source_bucket_arn = "<ENTER_S3_BUCKET_ARN>" # Module creates a new S3 bucket if `source_bucket_arn` is not specified
