@@ -73,7 +73,7 @@ module "mwaa" {
   name                 = "basic-mwaa"
   airflow_version      = "2.2.2"
   environment_class    = "mw1.medium"
-  source_bucket_arn    = "arn:aws:s3:${var.region}:${local.account_id}:${var.mwaas3bucket}"
+  source_bucket_arn    = "arn:aws:s3:::${var.mwaas3bucket}"
   dag_s3_path          = "dags"
 
   ## If uploading requirements.txt or plugins, you can enable these via these options

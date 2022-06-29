@@ -1,19 +1,19 @@
 variable "name" {
   description = "Name of MWAA Environment"
-  default     = "basic-mwaa"
+  default     = "terraform-basic-mwaa"
   type        = string
 }
 
 variable "mwaas3bucket" {
   description = "MWAA Dags Folder"
-  default     = "mwaa-terraform-unique-bucket"
+  default     = "094450-mwaa-terraform-unique-bucket"
   type        = string
 }
 
 variable "region" {
   description = "region"
   type        = string
-  default     = "us-west-2"
+  default     = "eu-central-1"
 }
 
 variable "tags" {
