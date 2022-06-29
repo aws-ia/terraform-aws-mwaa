@@ -4,6 +4,12 @@ variable "name" {
   type        = string
 }
 
+variable "mwaas3bucket" {
+  description = "MWAA Dags Folder"
+  default     = "mwaa-terraform-unique-bucket"
+  type        = string
+}
+
 variable "region" {
   description = "region"
   type        = string
