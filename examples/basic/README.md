@@ -71,14 +71,14 @@ This is a very simple workflow that has two tasks that use the BashOperator to e
 
 **Terraform generated S3 bucket**
 
-Copy this file using the AWS cli using the following command, replacing the `{mwaa_dags_folder}` with the name of your MWAA environment's S3 bucket.
+Copy this file using the AWS Cli using the following command, replacing the `{mwaa_dags_folder}` with the name of your MWAA environment's S3 bucket.
 
 ```sh
 cd dags
 aws s3 cp hello_world_dag.py s3://{mwaa_dags_folder}/dags/
 ```
 
-**Bring your own S3 bucket**
+**Bring your own S3 Bucket**
 
 If you provided an S3 Bucket ARN to be used during the configuration of the MWAA environment, then use the following command to copy the sample dag.
 
