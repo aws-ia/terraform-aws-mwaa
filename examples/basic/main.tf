@@ -9,57 +9,70 @@ provider "aws" {
 
 data "aws_availability_zones" "available" {}
 
+data "aws_caller_identity" "current" {}
+
 locals {
-  azs = slice(data.aws_availability_zones.available.names, 0, 2)
+  azs         = slice(data.aws_availability_zones.available.names, 0, 2)
+  bucket_name = format("%s-%s-", "mwaa", data.aws_caller_identity.current.account_id)
 }
 
 #-----------------------------------------------------------
-# Create an S3 bucket and upload sample DAG 
+# Create an S3 bucket and upload sample DAG
 #-----------------------------------------------------------
-
-resource "aws_s3_bucket" "dags" {
-  bucket = var.mwaas3bucket  
-  tags = var.tags
+#tfsec:ignore:AWS017
+#tfsec:ignore:AWS002
+#tfsec:ignore:AWS077
+resource "aws_s3_bucket" "this" {
+  bucket = local.bucket_name
+  tags   = var.tags
 }
 
-resource "aws_s3_bucket_acl" "dags" {
-  bucket = aws_s3_bucket.dags.id
+resource "aws_s3_bucket_acl" "this" {
+  bucket = aws_s3_bucket.this.id
   acl    = "private"
 }
 
-resource "aws_s3_bucket_versioning" "dags" {
-  bucket = aws_s3_bucket.dags.id
+resource "aws_s3_bucket_versioning" "this" {
+  bucket = aws_s3_bucket.this.id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "dags" {
-  bucket = aws_s3_bucket.dags.id
-  block_public_acls   = true
-  block_public_policy = true
-  ignore_public_acls = true
+resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
+  bucket = aws_s3_bucket.this.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "this" {
+  bucket                  = aws_s3_bucket.this.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
   restrict_public_buckets = true
 }
 
 # Upload DAGS
-
 resource "aws_s3_object" "object1" {
-for_each = fileset("dags/", "*")
-bucket = aws_s3_bucket.dags.id
-key = "dags/${each.value}"
-source = "dags/${each.value}"
-etag = filemd5("dags/${each.value}")
+  for_each = fileset("dags/", "*")
+  bucket   = aws_s3_bucket.this.id
+  key      = "dags/${each.value}"
+  source   = "dags/${each.value}"
+  etag     = filemd5("dags/${each.value}")
 }
 
 # Upload plugins/requirements.txt
-
 resource "aws_s3_object" "reqs" {
-for_each = fileset("mwaa/", "*")
-bucket = aws_s3_bucket.dags.id
-key = "${each.value}"
-source = "mwaa/${each.value}"
-etag = filemd5("mwaa/${each.value}")
+  for_each = fileset("mwaa/", "*")
+  bucket   = aws_s3_bucket.this.id
+  key      = each.value
+  source   = "mwaa/${each.value}"
+  etag     = filemd5("mwaa/${each.value}")
 }
 
 #-----------------------------------------------------------
@@ -68,11 +81,11 @@ etag = filemd5("mwaa/${each.value}")
 module "mwaa" {
   source = "../.."
 
-  name                 = "basic-mwaa"
-  airflow_version      = "2.2.2"
-  environment_class    = "mw1.medium"
-  source_bucket_arn    = "arn:aws:s3:::${var.mwaas3bucket}"
-  dag_s3_path          = "dags"
+  name              = "basic-mwaa"
+  airflow_version   = "2.2.2"
+  environment_class = "mw1.medium"
+  source_bucket_arn = aws_s3_bucket.this.arn
+  dag_s3_path       = "dags"
 
   ## If uploading requirements.txt or plugins, you can enable these via these options
   #plugins_s3_path      = "plugins.zip"
@@ -107,9 +120,9 @@ module "mwaa" {
 
   airflow_configuration_options = {
     "core.load_default_connections" = "false"
-    "core.load_examples" = "false"
-    "webserver.dag_default_view" = "tree"
-    "webserver.dag_orientation" = "TB"
+    "core.load_examples"            = "false"
+    "webserver.dag_default_view"    = "tree"
+    "webserver.dag_orientation"     = "TB"
   }
 
   min_workers        = 1
@@ -120,7 +133,7 @@ module "mwaa" {
   webserver_access_mode = "PUBLIC_ONLY"   # Choose the Private network option(PRIVATE_ONLY) if your Apache Airflow UI is only accessed within a corporate network, and you do not require access to public repositories for web server requirements installation
   source_cidr           = ["10.1.0.0/16"] # Add your IP address to access Airflow UI
 
-  # create_security_group = true # change to to `false` to bring your sec group using `security_group_ids`
+  # create_security_group = true # change to to `false` to bring your own sec group using `security_group_ids`
   # execution_role_arn = "<ENTER_YOUR_IAM_ROLE_ARN>" # Module creates a new IAM role if `execution_role_arn` is not specified
 
   tags = var.tags

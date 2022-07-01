@@ -66,51 +66,58 @@ Open the output URL(`mwaa_webserver_url`) from a browser to verify the Amazon MW
 
 #### Step 6: Verify the Amazon MWAA using the sample Apache Airflow workflow
 
-In the dags folder you will have a simple DAG file (hello_world_dag.py) which you can use to test your MWAA environment. This is a very simple workflow that has two tasks that use the BashOperator to echo out a simple string.
+In the `dags` folder you will have a simple DAG file (`hello_world_dag.py`) which you can use to test your MWAA environment.
+This is a very simple workflow that has two tasks that use the BashOperator to echo out a simple string.
 
 **Terraform generated S3 bucket**
 
-Copy this file using the AWS cli using the following command, replacing the {mwaa_dags_folder} with the name of your MWAA environment's S3 bucket.
+Copy this file using the AWS cli using the following command, replacing the `{mwaa_dags_folder}` with the name of your MWAA environment's S3 bucket.
 
-```
+```sh
 cd dags
-aws s3 cp hello_world_dag.py s3://{mwaa_dags_folder/dags/}
+aws s3 cp hello_world_dag.py s3://{mwaa_dags_folder}/dags/
 ```
 
 **Bring your own S3 bucket**
 
-If you provided an S3 bucket arn to be used during the configuration of the MWAA environment, then use the following command to copy the sample dag.
+If you provided an S3 Bucket ARN to be used during the configuration of the MWAA environment, then use the following command to copy the sample dag.
 
-```
+```sh
 cd dags
-aws s3 cp hello_world_dag.py s3://{your_s3_bucket}/dags/}
+aws s3 cp hello_world_dag.py s3://{your_s3_bucket}/dags/
 ```
 
 > **Note!** in the above examples, this assumes that you defined the MWAA dags folder to be "dags" (which is the default) so if you changed that, please change the /dags/ to whatever you configured that to be.
 >
 
-Once the DAG has been copied, it might take 2-3 minutes before you see the DAG appear in the Apache Airflow UI. 
+Once the DAG has been copied, it might take 2-3 minutes before you see the DAG appear in the Apache Airflow UI.
 
-![example DAGs in Apache Airflow UI](../../images/mwaa-dag-ui.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/aws-ia/terraform-aws-mwaa/main/images/mwaa-dag-ui.png" alt="example DAGs in Apache Airflow UI" width="100%">
+</p>
 
 By default, it will be disabled (paused) but you can enable it and it should then run.
 
-![viewing the DAG running](../../images/mwaa-dag-running.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/aws-ia/terraform-aws-mwaa/main/images/mwaa-dag-running.png" alt="viewing the DAG running" width="100%">
+</p>
 
 Check the status of the task, and view the logs to make sure you get the expected output.
 
-![viewing the DAG log files in Apache Airflow UI](../../images/mwaa-example-log.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/aws-ia/terraform-aws-mwaa/main/images/mwaa-example-log.png" alt="viewing the DAG log files in Apache Airflow UI" width="100%">
+</p>
 
 You can additionally check the MWAA environment CloudWatch logs to make sure that these have all been created and that you can view output generated as part of this workflow.
 
-![look at the CloudWatch log groups created](../../images/mwaa-cloudwatch-loggroup.png)
-
-
-
-
+<p align="center">
+  <img src="https://raw.githubusercontent.com/aws-ia/terraform-aws-mwaa/main/images/mwaa-cloudwatch-loggroup.png" alt="look at the CloudWatch log groups created" width="100%">
+</p>
 
 ## Cleanup
 To clean up your environment, destroy the Terraform module.
+
+*NOTE:* Empty the S3 bucket created by this module before executing the `terraform destroy`
 
 ```sh
 terraform destroy -auto-approve

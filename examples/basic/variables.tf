@@ -1,12 +1,6 @@
 variable "name" {
   description = "Name of MWAA Environment"
-  default     = "terraform-basic-mwaa"
-  type        = string
-}
-
-variable "mwaas3bucket" {
-  description = "MWAA Dags Folder"
-  default     = "094450-mwaa-terraform-unique-bucket"
+  default     = "basic-mwaa"
   type        = string
 }
 
