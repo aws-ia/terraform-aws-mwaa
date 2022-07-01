@@ -7,10 +7,12 @@ This terraform module can be used to deploy [Amazon Managed Workflows for Apache
    ✅ Amazon MWAA documentation for more details about [Amazon MWAA](https://docs.aws.amazon.com/mwaa/index.html)
 
    ✅ Amazon MWAA for Analytics [Workshop](https://catalog.us-east-1.prod.workshops.aws/workshops/795e88bb-17e2-498f-82d1-2104f4824168/en-US)
-   
+
 ## Amazon MWAA Architecture
 
-![example of Amazon MWAA Architecture for an example public deployment](images/mwaa-architecture-terraform-iac.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/aws-ia/terraform-aws-mwaa/main/images/mwaa-architecture-iac.png" alt="Amazon MWAA Architecture for an example public deployment" width="100%">
+</p>
 
 ## Usage
 
@@ -59,7 +61,7 @@ module "mwaa" {
       log_level = "INFO"
     }
   }
-  
+
   airflow_configuration_options = {
     "core.load_default_connections" = "false"
     "core.load_examples"            = "false"
