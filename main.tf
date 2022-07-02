@@ -113,6 +113,7 @@ resource "aws_s3_bucket_acl" "mwaa" {
   acl    = "private"
 }
 
+#tfsec:ignore:aws-s3-encryption-customer-key
 resource "aws_s3_bucket_server_side_encryption_configuration" "mwaa" {
   count = var.create_s3_bucket ? 1 : 0
 
@@ -187,7 +188,7 @@ resource "aws_security_group_rule" "mwaa_sg_inbound_vpn" {
   description       = "VPN Access for Airflow UI"
 }
 
-#tfsec:ignore:AWS007
+#tfsec:ignore:aws-vpc-no-public-egress-sgr
 resource "aws_security_group_rule" "mwaa_sg_outbound" {
   count = var.create_security_group ? 1 : 0
 
