@@ -7,7 +7,7 @@ variable "name" {
 variable "region" {
   description = "region"
   type        = string
-  default     = "eu-central-1"
+  default     = "eu-west-1"
 }
 
 variable "tags" {

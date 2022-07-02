@@ -127,13 +127,15 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_airflow_configuration_options"></a> [airflow\_configuration\_options](#input\_airflow\_configuration\_options) | (Optional) The airflow\_configuration\_options parameter specifies airflow override options. | `any` | `null` | no |
 | <a name="input_airflow_version"></a> [airflow\_version](#input\_airflow\_version) | (Optional) Airflow version of your environment, will be set by default to the latest version that MWAA supports. | `string` | `null` | no |
+| <a name="input_create_iam_role"></a> [create\_iam\_role](#input\_create\_iam\_role) | Create IAM role for MWAA | `bool` | `true` | no |
+| <a name="input_create_s3_bucket"></a> [create\_s3\_bucket](#input\_create\_s3\_bucket) | Create new S3 bucket for MWAA. | `string` | `true` | no |
 | <a name="input_create_security_group"></a> [create\_security\_group](#input\_create\_security\_group) | Create security group for MWAA | `bool` | `true` | no |
 | <a name="input_dag_s3_path"></a> [dag\_s3\_path](#input\_dag\_s3\_path) | (Required) The relative path to the DAG folder on your Amazon S3 storage bucket. For example, dags. | `string` | `"dags"` | no |
 | <a name="input_environment_class"></a> [environment\_class](#input\_environment\_class) | (Optional) Environment class for the cluster. Possible options are mw1.small, mw1.medium, mw1.large.<br>Will be set by default to mw1.small. Please check the AWS Pricing for more information about the environment classes. | `string` | `"mw1.small"` | no |
 | <a name="input_execution_role_arn"></a> [execution\_role\_arn](#input\_execution\_role\_arn) | (Required) The Amazon Resource Name (ARN) of the task execution role that the Amazon MWAA and its environment can assume<br>Mandatory if `create_iam_role=false` | `string` | `null` | no |
 | <a name="input_force_detach_policies"></a> [force\_detach\_policies](#input\_force\_detach\_policies) | IAM role Force detach policies | `bool` | `false` | no |
 | <a name="input_iam_role_additional_policies"></a> [iam\_role\_additional\_policies](#input\_iam\_role\_additional\_policies) | Additional policies to be added to the IAM role | `list(string)` | `[]` | no |
-| <a name="input_iam_role_name"></a> [iam\_role\_name](#input\_iam\_role\_name) | IAM Role Name to be created if execution\_role\_arn is null | `bool` | `null` | no |
+| <a name="input_iam_role_name"></a> [iam\_role\_name](#input\_iam\_role\_name) | IAM Role Name to be created if execution\_role\_arn is null | `string` | `null` | no |
 | <a name="input_iam_role_path"></a> [iam\_role\_path](#input\_iam\_role\_path) | IAM role path | `string` | `"/"` | no |
 | <a name="input_iam_role_permissions_boundary"></a> [iam\_role\_permissions\_boundary](#input\_iam\_role\_permissions\_boundary) | IAM role Permission boundary | `string` | `null` | no |
 | <a name="input_kms_key"></a> [kms\_key](#input\_kms\_key) | (Optional) The Amazon Resource Name (ARN) of your KMS key that you want to use for encryption.<br>Will be set to the ARN of the managed KMS key aws/airflow by default. | `string` | `null` | no |
@@ -149,7 +151,7 @@ No modules.
 | <a name="input_schedulers"></a> [schedulers](#input\_schedulers) | (Optional) The number of schedulers that you want to run in your environment. | `string` | `null` | no |
 | <a name="input_security_group_ids"></a> [security\_group\_ids](#input\_security\_group\_ids) | Security group IDs for MWAA | `list(string)` | `[]` | no |
 | <a name="input_source_bucket_arn"></a> [source\_bucket\_arn](#input\_source\_bucket\_arn) | (Required) The Amazon Resource Name (ARN) of your Amazon S3 storage bucket. For example, arn:aws:s3:::airflow-mybucketname | `string` | `null` | no |
-| <a name="input_source_bucket_name"></a> [source\_bucket\_name](#input\_source\_bucket\_name) | New bucket will be created with the given name for MWAA | `string` | `null` | no |
+| <a name="input_source_bucket_name"></a> [source\_bucket\_name](#input\_source\_bucket\_name) | New bucket will be created with the given name for MWAA when create\_s3\_bucket=true | `string` | `null` | no |
 | <a name="input_source_cidr"></a> [source\_cidr](#input\_source\_cidr) | (Required) Source CIDR block which will be allowed on MWAA SG to access Airflow UI<br>Used only if `create_security_group=true` | `list(string)` | `[]` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) A map of resource tags to associate with the resource | `map(string)` | `{}` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | (Required) VPC ID to deploy the MWAA Environment.<br>Mandatory if `create_security_group=true` | `string` | `""` | no |

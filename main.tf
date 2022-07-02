@@ -68,7 +68,7 @@ resource "aws_mwaa_environment" "mwaa" {
 # IAM Role
 # ---------------------------------------------------------------------------------------------------------------------
 resource "aws_iam_role" "mwaa" {
-  count = var.execution_role_arn != null ? 0 : 1
+  count = var.create_iam_role ? 1 : 0
 
   name                  = var.iam_role_name != null ? var.iam_role_name : null
   name_prefix           = var.iam_role_name != null ? null : "mwaa-executor"
@@ -82,7 +82,7 @@ resource "aws_iam_role" "mwaa" {
 }
 
 resource "aws_iam_role_policy" "mwaa" {
-  count = var.execution_role_arn != null ? 0 : 1
+  count = var.create_iam_role ? 1 : 0
 
   name_prefix = "mwaa-executor"
   role        = aws_iam_role.mwaa[0].id
@@ -98,25 +98,23 @@ resource "aws_iam_role_policy_attachment" "mwaa" {
 # ---------------------------------------------------------------------------------------------------------------------
 # MWAA S3 Bucket
 # ---------------------------------------------------------------------------------------------------------------------
-#tfsec:ignore:AWS017
-#tfsec:ignore:AWS002
-#tfsec:ignore:AWS077
+#tfsec:ignore:AWS017 tfsec:ignore:AWS002 tfsec:ignore:AWS077
 resource "aws_s3_bucket" "mwaa" {
-  count = var.source_bucket_arn != null ? 0 : 1
+  count = var.create_s3_bucket ? 1 : 0
 
   bucket_prefix = var.source_bucket_name != null ? var.source_bucket_name : format("%s-%s-", "mwaa", data.aws_caller_identity.current.account_id)
   tags          = var.tags
 }
 
 resource "aws_s3_bucket_acl" "mwaa" {
-  count = var.source_bucket_arn != null ? 0 : 1
+  count = var.create_s3_bucket ? 1 : 0
 
   bucket = aws_s3_bucket.mwaa[0].id
   acl    = "private"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "mwaa" {
-  count = var.source_bucket_arn != null ? 0 : 1
+  count = var.create_s3_bucket ? 1 : 0
 
   bucket = aws_s3_bucket.mwaa[0].id
 
@@ -128,7 +126,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "mwaa" {
 }
 
 resource "aws_s3_bucket_versioning" "mwaa" {
-  count = var.source_bucket_arn != null ? 0 : 1
+  count = var.create_s3_bucket ? 1 : 0
 
   bucket = aws_s3_bucket.mwaa[0].id
 
@@ -138,7 +136,7 @@ resource "aws_s3_bucket_versioning" "mwaa" {
 }
 
 resource "aws_s3_bucket_public_access_block" "mwaa" {
-  count = var.source_bucket_arn != null ? 0 : 1
+  count = var.create_s3_bucket ? 1 : 0
 
   bucket = aws_s3_bucket.mwaa[0].id
 
@@ -149,14 +147,14 @@ resource "aws_s3_bucket_public_access_block" "mwaa" {
 }
 
 resource "aws_s3_object" "plugins" {
-  count = var.source_bucket_arn != null ? 0 : 1
+  count = var.create_s3_bucket ? 1 : 0
 
   key    = "plugins.zip"
   bucket = aws_s3_bucket.mwaa[0].id
 }
 
 resource "aws_s3_object" "python_requirements" {
-  count = var.source_bucket_arn != null ? 0 : 1
+  count = var.create_s3_bucket ? 1 : 0
 
   key    = "requirements.txt"
   bucket = aws_s3_bucket.mwaa[0].id
@@ -166,7 +164,7 @@ resource "aws_s3_object" "python_requirements" {
 # MWAA Security Group
 # ---------------------------------------------------------------------------------------------------------------------
 resource "aws_security_group" "mwaa" {
-  count = var.create_security_group == true ? 1 : 0
+  count = var.create_security_group ? 1 : 0
 
   name_prefix = "mwaa-"
   description = "Security group for MWAA environment"
@@ -180,7 +178,7 @@ resource "aws_security_group" "mwaa" {
 }
 
 resource "aws_security_group_rule" "mwaa_sg_inbound" {
-  count = var.create_security_group == true ? 1 : 0
+  count = var.create_security_group ? 1 : 0
 
   type                     = "ingress"
   from_port                = 0
@@ -192,7 +190,7 @@ resource "aws_security_group_rule" "mwaa_sg_inbound" {
 }
 
 resource "aws_security_group_rule" "mwaa_sg_inbound_vpn" {
-  count = var.create_security_group == true && length(var.source_cidr) > 0 ? 1 : 0
+  count = var.create_security_group && length(var.source_cidr) > 0 ? 1 : 0
 
   type              = "ingress"
   from_port         = 443
@@ -205,7 +203,7 @@ resource "aws_security_group_rule" "mwaa_sg_inbound_vpn" {
 
 #tfsec:ignore:AWS007
 resource "aws_security_group_rule" "mwaa_sg_outbound" {
-  count = var.create_security_group == true ? 1 : 0
+  count = var.create_security_group ? 1 : 0
 
   type              = "egress"
   from_port         = 0

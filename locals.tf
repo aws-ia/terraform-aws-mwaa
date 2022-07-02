@@ -1,9 +1,9 @@
 locals {
-  execution_role_arn = var.execution_role_arn != null ? var.execution_role_arn : aws_iam_role.mwaa[0].arn
+  execution_role_arn = var.create_iam_role ? aws_iam_role.mwaa[0].arn : var.execution_role_arn
 
-  security_group_ids = length(var.security_group_ids) > 0 ? var.security_group_ids : [aws_security_group.mwaa[0].id]
+  security_group_ids = var.create_security_group ? [aws_security_group.mwaa[0].id] : var.security_group_ids
 
-  source_bucket_arn = var.source_bucket_arn != null ? var.source_bucket_arn : aws_s3_bucket.mwaa[0].arn
+  source_bucket_arn = var.create_s3_bucket ? aws_s3_bucket.mwaa[0].arn : var.source_bucket_arn
 
   default_airflow_configuration_options = {
     "logging.logging_level" = "INFO"
