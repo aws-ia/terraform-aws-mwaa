@@ -133,6 +133,7 @@ module "mwaa" {
   source_cidr           = ["10.1.0.0/16"] # Add your IP address to access Airflow UI
 
   tags = var.tags
+
 }
 
 #---------------------------------------------------------------

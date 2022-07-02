@@ -78,7 +78,7 @@ cd dags
 aws s3 cp hello_world_dag.py s3://{mwaa_dags_folder}/dags/
 ```
 
-**Bring your own S3 bucket**
+**Bring your own S3 Bucket**
 
 If you provided an S3 Bucket ARN to be used during the configuration of the MWAA environment, then use the following command to copy the sample dag.
 
