@@ -127,9 +127,15 @@ variable "tags" {
 #----------------------------------------------------------------
 # MWAA IAM Role
 #----------------------------------------------------------------
+variable "create_iam_role" {
+  description = "Create IAM role for MWAA"
+  type        = bool
+  default     = true
+}
+
 variable "iam_role_name" {
   description = "IAM Role Name to be created if execution_role_arn is null"
-  type        = bool
+  type        = string
   default     = null
 }
 
@@ -168,16 +174,22 @@ variable "execution_role_arn" {
 #----------------------------------------------------------------
 # MWAA S3 Bucket
 #----------------------------------------------------------------
-variable "source_bucket_arn" {
-  description = "(Required) The Amazon Resource Name (ARN) of your Amazon S3 storage bucket. For example, arn:aws:s3:::airflow-mybucketname"
+variable "create_s3_bucket" {
+  description = "Create new S3 bucket for MWAA. "
   type        = string
-  default     = null
+  default     = true
 }
 
 variable "source_bucket_name" {
   description = <<-EOD
-  New bucket will be created with the given name for MWAA
+  New bucket will be created with the given name for MWAA when create_s3_bucket=true
   EOD
+  type        = string
+  default     = null
+}
+
+variable "source_bucket_arn" {
+  description = "(Required) The Amazon Resource Name (ARN) of your Amazon S3 storage bucket. For example, arn:aws:s3:::airflow-mybucketname"
   type        = string
   default     = null
 }
@@ -185,16 +197,16 @@ variable "source_bucket_name" {
 #----------------------------------------------------------------
 # MWAA Security groups
 #----------------------------------------------------------------
-variable "security_group_ids" {
-  description = "Security group IDs for MWAA"
-  type        = list(string)
-  default     = []
-}
-
 variable "create_security_group" {
   description = "Create security group for MWAA"
   type        = bool
   default     = true
+}
+
+variable "security_group_ids" {
+  description = "Security group IDs for MWAA"
+  type        = list(string)
+  default     = []
 }
 
 variable "vpc_id" {

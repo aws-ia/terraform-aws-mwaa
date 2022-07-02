@@ -71,7 +71,7 @@ This is a very simple workflow that has two tasks that use the BashOperator to e
 
 **Terraform generated S3 bucket**
 
-Copy this file using the AWS Cli using the following command, replacing the `{mwaa_dags_folder}` with the name of your MWAA environment's S3 bucket.
+Copy this file using the AWS cli using the following command, replacing the `{mwaa_dags_folder}` with the name of your MWAA environment's S3 bucket.
 
 ```sh
 cd dags
@@ -117,7 +117,7 @@ You can additionally check the MWAA environment CloudWatch logs to make sure tha
 ## Cleanup
 To clean up your environment, destroy the Terraform module.
 
-NOTE: Empty the S3 bucket created by this module before executing the `terraform destroy`
+*NOTE:* Empty the S3 bucket created by this module before executing the `terraform destroy`
 
 ```sh
 terraform destroy -auto-approve

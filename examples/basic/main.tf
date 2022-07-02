@@ -9,21 +9,86 @@ provider "aws" {
 
 data "aws_availability_zones" "available" {}
 
+data "aws_caller_identity" "current" {}
+
 locals {
-  azs = slice(data.aws_availability_zones.available.names, 0, 2)
+  azs         = slice(data.aws_availability_zones.available.names, 0, 2)
+  bucket_name = format("%s-%s", "aws-ia-mwaa", data.aws_caller_identity.current.account_id)
 }
+
+#-----------------------------------------------------------
+# Create an S3 bucket and upload sample DAG
+#-----------------------------------------------------------
+#tfsec:ignore:AWS017 tfsec:ignore:AWS002 tfsec:ignore:AWS077
+resource "aws_s3_bucket" "this" {
+  bucket = local.bucket_name
+  tags   = var.tags
+}
+
+resource "aws_s3_bucket_acl" "this" {
+  bucket = aws_s3_bucket.this.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_versioning" "this" {
+  bucket = aws_s3_bucket.this.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
+  bucket = aws_s3_bucket.this.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "this" {
+  bucket                  = aws_s3_bucket.this.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# Upload DAGS
+resource "aws_s3_object" "object1" {
+  for_each = fileset("dags/", "*")
+  bucket   = aws_s3_bucket.this.id
+  key      = "dags/${each.value}"
+  source   = "dags/${each.value}"
+  etag     = filemd5("dags/${each.value}")
+}
+
+# Upload plugins/requirements.txt
+resource "aws_s3_object" "reqs" {
+  for_each = fileset("mwaa/", "*")
+  bucket   = aws_s3_bucket.this.id
+  key      = each.value
+  source   = "mwaa/${each.value}"
+  etag     = filemd5("mwaa/${each.value}")
+}
+
 #-----------------------------------------------------------
 # NOTE: MWAA Airflow environment takes minimum of 20 mins
 #-----------------------------------------------------------
 module "mwaa" {
   source = "../.."
 
-  name                 = "basic-mwaa"
-  airflow_version      = "2.2.2"
-  environment_class    = "mw1.medium"
-  dag_s3_path          = "dags"
-  plugins_s3_path      = "plugins.zip"
-  requirements_s3_path = "requirements.txt"
+  name              = var.name
+  airflow_version   = "2.2.2"
+  environment_class = "mw1.medium"
+  create_s3_bucket  = false
+  source_bucket_arn = aws_s3_bucket.this.arn
+  dag_s3_path       = "dags"
+
+  ## If uploading requirements.txt or plugins, you can enable these via these options
+  #plugins_s3_path      = "plugins.zip"
+  #requirements_s3_path = "requirements.txt"
 
   logging_configuration = {
     dag_processing_logs = {
@@ -52,32 +117,23 @@ module "mwaa" {
     }
   }
 
-  airflow_configuration_options = { # Checkout the suggested Airflow configurations under https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-env-variables.html
-    "core.default_task_retries"            = 3
-    "celery.worker_autoscale"              = "5,5"
-    "core.check_slas"                      = "false"
-    "core.dag_concurrency"                 = 96
-    "core.dag_file_processor_timeout"      = 600
-    "core.dagbag_import_timeout"           = 600
-    "core.max_active_runs_per_dag"         = 32
-    "core.parallelism"                     = 64
-    "scheduler.processor_poll_interval"    = 15
-    "logging.logging_level"                = "INFO"
-    "core.dag_file_processor_timeout"      = 120
-    "web_server.web_server_master_timeout" = 480
-    "web_server.web_server_worker_timeout" = 480
+  airflow_configuration_options = {
+    "core.load_default_connections" = "false"
+    "core.load_examples"            = "false"
+    "webserver.dag_default_view"    = "tree"
+    "webserver.dag_orientation"     = "TB"
   }
+
   min_workers        = 1
-  max_workers        = 25
+  max_workers        = 2
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnets
 
   webserver_access_mode = "PUBLIC_ONLY"   # Choose the Private network option(PRIVATE_ONLY) if your Apache Airflow UI is only accessed within a corporate network, and you do not require access to public repositories for web server requirements installation
   source_cidr           = ["10.1.0.0/16"] # Add your IP address to access Airflow UI
-  tags                  = var.tags
-  # create_security_group = true # change to to `false` to bring your sec group using `security_group_ids`
-  # source_bucket_arn = "<ENTER_S3_BUCKET_ARN>" # Module creates a new S3 bucket if `source_bucket_arn` is not specified
-  # execution_role_arn = "<ENTER_YOUR_IAM_ROLE_ARN>" # Module creates a new IAM role if `execution_role_arn` is not specified
+
+  tags = var.tags
+
 }
 
 #---------------------------------------------------------------
