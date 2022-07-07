@@ -9,23 +9,25 @@ resource "aws_mwaa_environment" "mwaa" {
   max_workers       = var.max_workers
   kms_key           = var.kms_key
 
-  dag_s3_path                   = var.dag_s3_path
-  plugins_s3_object_version     = var.plugins_s3_object_version
-  plugins_s3_path               = var.plugins_s3_path
-  requirements_s3_path          = var.requirements_s3_path
-  schedulers                    = var.schedulers
-  execution_role_arn            = local.execution_role_arn
-  airflow_configuration_options = local.airflow_configuration_options
+  dag_s3_path                    = var.dag_s3_path
+  plugins_s3_object_version      = var.plugins_s3_object_version
+  plugins_s3_path                = var.plugins_s3_path
+  requirements_s3_path           = var.requirements_s3_path
+  requirements_s3_object_version = var.requirements_s3_object_version
+  schedulers                     = var.schedulers
+  execution_role_arn             = local.execution_role_arn
+  airflow_configuration_options  = local.airflow_configuration_options
+
+  source_bucket_arn               = local.source_bucket_arn
+  webserver_access_mode           = var.webserver_access_mode
+  weekly_maintenance_window_start = var.weekly_maintenance_window_start
+
+  tags = var.tags
 
   network_configuration {
     security_group_ids = local.security_group_ids
     subnet_ids         = var.private_subnet_ids
   }
-
-  source_bucket_arn               = local.source_bucket_arn
-  webserver_access_mode           = var.webserver_access_mode
-  weekly_maintenance_window_start = var.weekly_maintenance_window_start
-  requirements_s3_object_version  = var.requirements_s3_object_version
 
   logging_configuration {
     dag_processing_logs {
@@ -53,8 +55,6 @@ resource "aws_mwaa_environment" "mwaa" {
       log_level = try(var.logging_configuration.worker_logs.log_level, "CRITICAL")
     }
   }
-
-  tags = var.tags
 
   lifecycle {
     ignore_changes = [
@@ -113,6 +113,7 @@ resource "aws_s3_bucket_acl" "mwaa" {
   acl    = "private"
 }
 
+#tfsec:ignore:aws-s3-encryption-customer-key
 resource "aws_s3_bucket_server_side_encryption_configuration" "mwaa" {
   count = var.create_s3_bucket ? 1 : 0
 
@@ -144,20 +145,6 @@ resource "aws_s3_bucket_public_access_block" "mwaa" {
   block_public_policy     = true
   restrict_public_buckets = true
   ignore_public_acls      = true
-}
-
-resource "aws_s3_object" "plugins" {
-  count = var.create_s3_bucket ? 1 : 0
-
-  key    = "plugins.zip"
-  bucket = aws_s3_bucket.mwaa[0].id
-}
-
-resource "aws_s3_object" "python_requirements" {
-  count = var.create_s3_bucket ? 1 : 0
-
-  key    = "requirements.txt"
-  bucket = aws_s3_bucket.mwaa[0].id
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -201,7 +188,7 @@ resource "aws_security_group_rule" "mwaa_sg_inbound_vpn" {
   description       = "VPN Access for Airflow UI"
 }
 
-#tfsec:ignore:AWS007
+#tfsec:ignore:aws-vpc-no-public-egress-sgr
 resource "aws_security_group_rule" "mwaa_sg_outbound" {
   count = var.create_security_group ? 1 : 0
 
