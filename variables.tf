@@ -232,3 +232,9 @@ variable "requirements_s3_object_version" {
   type        = string
   default     = null
 }
+
+variable "secret_prefix" {
+  description = "Optional) The prefix for the Secret Manager secrets MWAA can have access to"
+  type        = string
+  default     = "NoneThisPrefixDoesNotExist1521662733"
+}

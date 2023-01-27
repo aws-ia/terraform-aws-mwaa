@@ -55,7 +55,9 @@ data "aws_iam_policy_document" "mwaa" {
   statement {
     effect = "Allow"
     actions = [
-      "s3:*"
+      "s3:GetObject*",
+      "s3:GetBucket*",
+      "s3:List*"
     ]
     resources = [
       local.source_bucket_arn,
@@ -84,12 +86,32 @@ data "aws_iam_policy_document" "mwaa" {
     actions = [
       "logs:DescribeLogGroups",
       "cloudwatch:PutMetricData",
-      "batch:DescribeJobs",
-      "batch:ListJobs",
-      "eks:*"
+      "s3:GetAccountPublicAccessBlock"
     ]
     resources = [
       "*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
+    resources = [
+      "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:${var.secret_prefix}/*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds"
+    ]
+    resources = [
+      "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
     ]
   }
 
@@ -108,26 +130,28 @@ data "aws_iam_policy_document" "mwaa" {
     ]
   }
 
-  statement {
-    effect = "Allow"
-    actions = [
-      "kms:Decrypt",
-      "kms:DescribeKey",
-      "kms:GenerateDataKey*",
-      "kms:Encrypt"
-    ]
-    not_resources = [
-      "arn:${data.aws_partition.current.id}:kms:*:${data.aws_caller_identity.current.account_id}:key/*"
-    ]
-    condition {
-      test     = "StringLike"
-      variable = "kms:ViaService"
+  # todo: define var.kms_id
+  # statement {
+  #   effect = "Allow"
+  #   actions = [
+  #     "kms:Decrypt",
+  #     "kms:DescribeKey",
+  #     "kms:GenerateDataKey*",
+  #     "kms:Encrypt"
+  #   ]
+  #   resources = [
+  #     "arn:${data.aws_partition.current.id}:kms:*:${data.aws_caller_identity.current.account_id}:key/{var.kms_id}"
+  #   ]
+  #   condition {
+  #     test     = "StringLike"
+  #     variable = "kms:ViaService"
 
-      values = [
-        "sqs.${data.aws_region.current.name}.amazonaws.com"
-      ]
-    }
-  }
+  #     values = [
+  #       "sqs.${data.aws_region.current.name}.amazonaws.com",
+  #       "s3.{your-region}.amazonaws.com"
+  #     ]
+  #   }
+  # }
 
   statement {
     effect = "Allow"
