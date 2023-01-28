@@ -130,28 +130,30 @@ data "aws_iam_policy_document" "mwaa" {
     ]
   }
 
-  # todo: define var.kms_id
-  # statement {
-  #   effect = "Allow"
-  #   actions = [
-  #     "kms:Decrypt",
-  #     "kms:DescribeKey",
-  #     "kms:GenerateDataKey*",
-  #     "kms:Encrypt"
-  #   ]
-  #   resources = [
-  #     "arn:${data.aws_partition.current.id}:kms:*:${data.aws_caller_identity.current.account_id}:key/{var.kms_id}"
-  #   ]
-  #   condition {
-  #     test     = "StringLike"
-  #     variable = "kms:ViaService"
+  # See note in https://docs.aws.amazon.com/mwaa/latest/userguide/mwaa-create-role.html
+  # if MWAA is using a AWS managed KMS key, we have to give permission to the key in ?? account
+  # We don't know what account AWS puts their key in so we use not_resources to grant access to all
+  # accounts except for ours 
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:GenerateDataKey*",
+      "kms:Encrypt"
+    ]
+    not_resources = [
+      "arn:${data.aws_partition.current.id}:kms:*:${data.aws_caller_identity.current.account_id}:key/*"
+    ]
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
 
-  #     values = [
-  #       "sqs.${data.aws_region.current.name}.amazonaws.com",
-  #       "s3.{your-region}.amazonaws.com"
-  #     ]
-  #   }
-  # }
+      values = [
+        "sqs.${data.aws_region.current.name}.amazonaws.com"
+      ]
+    }
+  }
 
   statement {
     effect = "Allow"
