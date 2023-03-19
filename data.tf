@@ -133,7 +133,7 @@ data "aws_iam_policy_document" "mwaa" {
   # See note in https://docs.aws.amazon.com/mwaa/latest/userguide/mwaa-create-role.html
   # if MWAA is using a AWS managed KMS key, we have to give permission to the key in ?? account
   # We don't know what account AWS puts their key in so we use not_resources to grant access to all
-  # accounts except for ours 
+  # accounts except for ours
   statement {
     effect = "Allow"
     actions = [
