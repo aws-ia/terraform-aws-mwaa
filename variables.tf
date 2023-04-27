@@ -96,6 +96,18 @@ variable "requirements_s3_path" {
   default     = null
 }
 
+variable "startup_script_s3_object_version" {
+  description = "(Optional) The version of the startup shell script you want to use. You must specify the version ID that Amazon S3 assigns to the file every time you update the script."
+  type        = string
+  default     = null
+}
+
+variable "startup_script_s3_path" {
+  description = "(Optional) The relative path to the script hosted in your bucket. The script runs as your environment starts before starting the Apache Airflow process. Use this script to install dependencies, modify configuration options, and set environment variables."
+  type        = string
+  default     = null
+}
+
 variable "schedulers" {
   description = "(Optional) The number of schedulers that you want to run in your environment."
   type        = string
@@ -189,7 +201,7 @@ variable "source_bucket_name" {
 }
 
 variable "source_bucket_arn" {
-  description = "(Required) The Amazon Resource Name (ARN) of your Amazon S3 storage bucket. For example, arn:aws:s3:::airflow-mybucketname"
+  description = "(Required ) The Amazon Resource Name (ARN) of your Amazon S3 storage bucket. For example, arn:aws:s3:::airflow-mybucketname"
   type        = string
   default     = null
 }
