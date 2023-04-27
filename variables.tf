@@ -79,13 +79,19 @@ variable "min_workers" {
 }
 
 variable "plugins_s3_object_version" {
-  description = " (Optional) The plugins.zip file version you want to use."
+  description = "(Optional) The plugins.zip file version you want to use."
   type        = string
   default     = null
 }
 
 variable "plugins_s3_path" {
   description = "(Optional) The relative path to the plugins.zip file on your Amazon S3 storage bucket. For example, plugins.zip. If a relative path is provided in the request, then plugins_s3_object_version is required."
+  type        = string
+  default     = null
+}
+
+variable "requirements_s3_object_version" {
+  description = "(Optional) The requirements.txt file version you want to use."
   type        = string
   default     = null
 }
@@ -237,10 +243,4 @@ variable "source_cidr" {
   EOD
   type        = list(string)
   default     = []
-}
-
-variable "requirements_s3_object_version" {
-  description = "Optional) The requirements.txt file version you want to use."
-  type        = string
-  default     = null
 }
