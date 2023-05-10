@@ -9,14 +9,16 @@ resource "aws_mwaa_environment" "mwaa" {
   max_workers       = var.max_workers
   kms_key           = var.kms_key
 
-  dag_s3_path                    = var.dag_s3_path
-  plugins_s3_object_version      = var.plugins_s3_object_version
-  plugins_s3_path                = var.plugins_s3_path
-  requirements_s3_path           = var.requirements_s3_path
-  requirements_s3_object_version = var.requirements_s3_object_version
-  schedulers                     = var.schedulers
-  execution_role_arn             = local.execution_role_arn
-  airflow_configuration_options  = local.airflow_configuration_options
+  dag_s3_path                      = var.dag_s3_path
+  plugins_s3_object_version        = var.plugins_s3_object_version
+  plugins_s3_path                  = var.plugins_s3_path
+  requirements_s3_path             = var.requirements_s3_path
+  requirements_s3_object_version   = var.requirements_s3_object_version
+  startup_script_s3_path           = var.startup_script_s3_path
+  startup_script_s3_object_version = var.startup_script_s3_object_version
+  schedulers                       = var.schedulers
+  execution_role_arn               = local.execution_role_arn
+  airflow_configuration_options    = local.airflow_configuration_options
 
   source_bucket_arn               = local.source_bucket_arn
   webserver_access_mode           = var.webserver_access_mode

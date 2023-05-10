@@ -79,7 +79,7 @@ variable "min_workers" {
 }
 
 variable "plugins_s3_object_version" {
-  description = " (Optional) The plugins.zip file version you want to use."
+  description = "(Optional) The plugins.zip file version you want to use."
   type        = string
   default     = null
 }
@@ -90,8 +90,26 @@ variable "plugins_s3_path" {
   default     = null
 }
 
+variable "requirements_s3_object_version" {
+  description = "(Optional) The requirements.txt file version you want to use."
+  type        = string
+  default     = null
+}
+
 variable "requirements_s3_path" {
   description = "(Optional) The relative path to the requirements.txt file on your Amazon S3 storage bucket. For example, requirements.txt. If a relative path is provided in the request, then requirements_s3_object_version is required."
+  type        = string
+  default     = null
+}
+
+variable "startup_script_s3_object_version" {
+  description = "(Optional) The version of the startup shell script you want to use. You must specify the version ID that Amazon S3 assigns to the file every time you update the script."
+  type        = string
+  default     = null
+}
+
+variable "startup_script_s3_path" {
+  description = "(Optional) The relative path to the script hosted in your bucket. The script runs as your environment starts before starting the Apache Airflow process. Use this script to install dependencies, modify configuration options, and set environment variables."
   type        = string
   default     = null
 }
@@ -225,10 +243,4 @@ variable "source_cidr" {
   EOD
   type        = list(string)
   default     = []
-}
-
-variable "requirements_s3_object_version" {
-  description = "Optional) The requirements.txt file version you want to use."
-  type        = string
-  default     = null
 }
