@@ -108,13 +108,6 @@ resource "aws_s3_bucket" "mwaa" {
   tags          = var.tags
 }
 
-resource "aws_s3_bucket_acl" "mwaa" {
-  count = var.create_s3_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.mwaa[0].id
-  acl    = "private"
-}
-
 #tfsec:ignore:aws-s3-encryption-customer-key
 resource "aws_s3_bucket_server_side_encryption_configuration" "mwaa" {
   count = var.create_s3_bucket ? 1 : 0
