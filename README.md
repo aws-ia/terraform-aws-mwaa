@@ -28,17 +28,17 @@ module "mwaa" {
   airflow_version      = "2.2.2"
   environment_class    = "mw1.medium"
 
-  input_iam_role_additional_policies = {
-    "additional-policy-1" = "<ENTER_POLICY_ARN1>"
-    "additional-policy-2" = "<ENTER_POLICY_ARN2>"
-  }
-
   vpc_id                = "<ENTER_VPC_ID>"
   private_subnet_ids    = ["<ENTER_SUBNET_ID1>","<ENTER_SUBNET_ID2>"]
 
   min_workers           = 1
   max_workers           = 25
   webserver_access_mode = "PUBLIC_ONLY" # Default PRIVATE_ONLY for production environments
+  
+  input_iam_role_additional_policies = {
+    "additional-policy-1" = "<ENTER_POLICY_ARN1>"
+    "additional-policy-2" = "<ENTER_POLICY_ARN2>"
+  }
 
   logging_configuration = {
     dag_processing_logs = {
