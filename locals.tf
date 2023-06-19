@@ -11,5 +11,5 @@ locals {
 
   airflow_configuration_options = merge(local.default_airflow_configuration_options, var.airflow_configuration_options)
 
-  iam_role_additional_policies = { for k, v in toset(concat([var.iam_role_additional_policies])) : k => v if var.execution_role_arn != null }
+  iam_role_additional_policies = { for k, v in var.iam_role_additional_policies : k => v if var.create_iam_role }
 }

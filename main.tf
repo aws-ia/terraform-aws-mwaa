@@ -93,7 +93,7 @@ resource "aws_iam_role_policy" "mwaa" {
 
 resource "aws_iam_role_policy_attachment" "mwaa" {
   for_each   = local.iam_role_additional_policies
-  policy_arn = each.key
+  policy_arn = each.value
   role       = aws_iam_role.mwaa[0].id
 }
 
