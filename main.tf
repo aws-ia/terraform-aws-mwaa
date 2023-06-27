@@ -9,14 +9,16 @@ resource "aws_mwaa_environment" "mwaa" {
   max_workers       = var.max_workers
   kms_key           = var.kms_key
 
-  dag_s3_path                    = var.dag_s3_path
-  plugins_s3_object_version      = var.plugins_s3_object_version
-  plugins_s3_path                = var.plugins_s3_path
-  requirements_s3_path           = var.requirements_s3_path
-  requirements_s3_object_version = var.requirements_s3_object_version
-  schedulers                     = var.schedulers
-  execution_role_arn             = local.execution_role_arn
-  airflow_configuration_options  = local.airflow_configuration_options
+  dag_s3_path                      = var.dag_s3_path
+  plugins_s3_object_version        = var.plugins_s3_object_version
+  plugins_s3_path                  = var.plugins_s3_path
+  requirements_s3_path             = var.requirements_s3_path
+  requirements_s3_object_version   = var.requirements_s3_object_version
+  startup_script_s3_path           = var.startup_script_s3_path
+  startup_script_s3_object_version = var.startup_script_s3_object_version
+  schedulers                       = var.schedulers
+  execution_role_arn               = local.execution_role_arn
+  airflow_configuration_options    = local.airflow_configuration_options
 
   source_bucket_arn               = local.source_bucket_arn
   webserver_access_mode           = var.webserver_access_mode
@@ -91,7 +93,7 @@ resource "aws_iam_role_policy" "mwaa" {
 
 resource "aws_iam_role_policy_attachment" "mwaa" {
   for_each   = local.iam_role_additional_policies
-  policy_arn = each.key
+  policy_arn = each.value
   role       = aws_iam_role.mwaa[0].id
 }
 
@@ -104,13 +106,6 @@ resource "aws_s3_bucket" "mwaa" {
 
   bucket_prefix = var.source_bucket_name != null ? var.source_bucket_name : format("%s-%s-", "mwaa", data.aws_caller_identity.current.account_id)
   tags          = var.tags
-}
-
-resource "aws_s3_bucket_acl" "mwaa" {
-  count = var.create_s3_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.mwaa[0].id
-  acl    = "private"
 }
 
 #tfsec:ignore:aws-s3-encryption-customer-key
