@@ -4,6 +4,10 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
+data "aws_s3_bucket" "selected" {
+  bucket = var.source_bucket_name
+}
+
 # ---------------------------------------------------------------------------------------------------------------------
 # MWAA Role
 # ---------------------------------------------------------------------------------------------------------------------
@@ -58,8 +62,8 @@ data "aws_iam_policy_document" "mwaa" {
       "s3:*"
     ]
     resources = [
-      local.source_bucket_arn,
-      "${local.source_bucket_arn}/*"
+      data.aws_s3_bucket.selected.arn,
+      "${data.aws_s3_bucket.selected.arn}/*"
     ]
   }
 

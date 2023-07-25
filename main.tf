@@ -20,7 +20,7 @@ resource "aws_mwaa_environment" "mwaa" {
   execution_role_arn               = local.execution_role_arn
   airflow_configuration_options    = local.airflow_configuration_options
 
-  source_bucket_arn               = local.source_bucket_arn
+  source_bucket_arn               = data.aws_s3_bucket.selected.arn
   webserver_access_mode           = var.webserver_access_mode
   weekly_maintenance_window_start = var.weekly_maintenance_window_start
 

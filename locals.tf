@@ -3,7 +3,7 @@ locals {
 
   security_group_ids = var.create_security_group ? concat([aws_security_group.mwaa[0].id], var.security_group_ids) : var.security_group_ids
 
-  source_bucket_arn = var.create_s3_bucket ? aws_s3_bucket.mwaa[0].arn : var.source_bucket_arn
+  source_bucket_arn = var.create_s3_bucket ? aws_s3_bucket.mwaa[0].arn : data.aws_s3_bucket.selected.arn
 
   default_airflow_configuration_options = {
     "logging.logging_level" = "INFO"
