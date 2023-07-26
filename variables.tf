@@ -206,11 +206,11 @@ variable "source_bucket_name" {
   default     = null
 }
 
-variable "source_bucket_arn" {
-  description = "(Required) The Amazon Resource Name (ARN) of your Amazon S3 storage bucket. For example, arn:aws:s3:::airflow-mybucketname"
-  type        = string
-  default     = null
-}
+#variable "source_bucket_arn" {
+#  description = "(Required) The Amazon Resource Name (ARN) of your Amazon S3 storage bucket. For example, arn:aws:s3:::airflow-mybucketname"
+#  type        = string
+#  default     = null
+#}
 
 #----------------------------------------------------------------
 # MWAA Security groups

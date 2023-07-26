@@ -7,7 +7,7 @@ resource "aws_mwaa_environment" "mwaa" {
   environment_class = var.environment_class
   min_workers       = var.min_workers
   max_workers       = var.max_workers
-  kms_key           = var.kms_key
+  kms_key           = data.aws_kms_key.by_alias.arn
 
   dag_s3_path                      = var.dag_s3_path
   plugins_s3_object_version        = var.plugins_s3_object_version
@@ -20,7 +20,7 @@ resource "aws_mwaa_environment" "mwaa" {
   execution_role_arn               = local.execution_role_arn
   airflow_configuration_options    = local.airflow_configuration_options
 
-  source_bucket_arn               = local.source_bucket_arn
+  source_bucket_arn               = data.aws_s3_bucket.selected.arn
   webserver_access_mode           = var.webserver_access_mode
   weekly_maintenance_window_start = var.weekly_maintenance_window_start
 
