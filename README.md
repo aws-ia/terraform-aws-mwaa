@@ -178,3 +178,6 @@ No modules.
 | <a name="output_mwaa_status"></a> [mwaa\_status](#output\_mwaa\_status) | The status of the Amazon MWAA Environment |
 | <a name="output_mwaa_webserver_url"></a> [mwaa\_webserver\_url](#output\_mwaa\_webserver\_url) | The webserver URL of the MWAA Environment |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
+## Resources
+Tools and sample code provided by AWS Premium Support for troubleshooting your MWAA Deployments - https://github.com/awslabs/aws-support-tools/tree/master/MWAA. 
