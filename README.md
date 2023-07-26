@@ -182,7 +182,7 @@ No modules.
 ## Resources
 Tools and sample code provided by AWS Premium Support for troubleshooting your MWAA Deployments : 
 
-```
+```hcl
 $ pip3 install boto3 --upgrade --user
 $ git clone https://github.com/awslabs/aws-support-tools.git
 $ python3 aws-support-tools/MWAA/verify_env/verify_env.py --envname YOUR_ENV_NAME_HERE
