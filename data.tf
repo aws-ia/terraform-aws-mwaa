@@ -8,6 +8,9 @@ data "aws_s3_bucket" "selected" {
   bucket = var.source_bucket_name
 }
 
+data "aws_kms_key" "by_alias" {
+  key_id = var.kms_key
+}
 # ---------------------------------------------------------------------------------------------------------------------
 # MWAA Role
 # ---------------------------------------------------------------------------------------------------------------------
@@ -25,23 +28,6 @@ data "aws_iam_policy_document" "mwaa_assume" {
       identifiers = ["airflow-env.amazonaws.com"]
     }
 
-    principals {
-      type        = "Service"
-      identifiers = ["batch.amazonaws.com"]
-    }
-
-    principals {
-      type        = "Service"
-      identifiers = ["ssm.amazonaws.com"]
-    }
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-    principals {
-      type        = "Service"
-      identifiers = ["s3.amazonaws.com"]
-    }
   }
 }
 #tfsec:ignore:AWS099
@@ -49,8 +35,7 @@ data "aws_iam_policy_document" "mwaa" {
   statement {
     effect = "Allow"
     actions = [
-      "airflow:PublishMetrics",
-      "airflow:CreateWebLoginToken"
+      "airflow:PublishMetrics"
     ]
     resources = [
       "arn:${data.aws_partition.current.id}:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:environment/${var.name}"
@@ -66,7 +51,16 @@ data "aws_iam_policy_document" "mwaa" {
       "${data.aws_s3_bucket.selected.arn}/*"
     ]
   }
-
+# Restrict Public Access 
+  statement {
+    effect = "Allow"
+    actions =  [
+        "s3:GetAccountPublicAccessBlock"
+    ]
+    resources = [
+      "*"
+    ]
+  }
   statement {
     effect = "Allow"
     actions = [
@@ -87,10 +81,7 @@ data "aws_iam_policy_document" "mwaa" {
     effect = "Allow"
     actions = [
       "logs:DescribeLogGroups",
-      "cloudwatch:PutMetricData",
-      "batch:DescribeJobs",
-      "batch:ListJobs",
-      "eks:*"
+      "cloudwatch:PutMetricData"
     ]
     resources = [
       "*"
@@ -113,57 +104,28 @@ data "aws_iam_policy_document" "mwaa" {
   }
 
   statement {
-    effect = "Allow"
-    actions = [
+    effect        = "Allow"
+    actions       = [
       "kms:Decrypt",
       "kms:DescribeKey",
       "kms:GenerateDataKey*",
-      "kms:Encrypt"
+      "kms:Encrypt",
+      "kms:PutKeyPolicy"
     ]
-    not_resources = [
-      "arn:${data.aws_partition.current.id}:kms:*:${data.aws_caller_identity.current.account_id}:key/*"
-    ]
+    resources     = data.aws_kms_key.by_alias.arn != null ? [
+      data.aws_kms_key.by_alias.arn
+    ] : []
+    not_resources = data.aws_kms_key.by_alias.arn == null ? [
+      "arn:aws:kms:*:${data.aws_caller_identity.current.account_id}:key/*"
+    ] : []
     condition {
       test     = "StringLike"
-      variable = "kms:ViaService"
-
-      values = [
+      values   = data.aws_kms_key.by_alias.arn != null ? [
+        "sqs.${data.aws_region.current.name}.amazonaws.com" ] : [
         "sqs.${data.aws_region.current.name}.amazonaws.com"
       ]
+      variable = "kms:ViaService"
     }
   }
 
-  statement {
-    effect = "Allow"
-    actions = [
-      "batch:*",
-    ]
-    resources = [
-      "arn:${data.aws_partition.current.id}:batch:*:${data.aws_caller_identity.current.account_id}:*"
-    ]
-  }
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "ssm:*"
-    ]
-    resources = [
-      "arn:${data.aws_partition.current.id}:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/*"
-    ]
-  }
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "logs:*"
-    ]
-    resources = ["arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/*"]
-  }
-
-  statement {
-    effect    = "Allow"
-    actions   = ["cloudwatch:*"]
-    resources = ["arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/*"]
-  }
 }
