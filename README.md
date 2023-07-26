@@ -179,7 +179,7 @@ No modules.
 | <a name="output_mwaa_webserver_url"></a> [mwaa\_webserver\_url](#output\_mwaa\_webserver\_url) | The webserver URL of the MWAA Environment |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
-## Resources
+## Troubleshooting
 Tools and sample code provided by AWS Premium Support for troubleshooting your MWAA Deployments : 
 
 ```hcl
