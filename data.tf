@@ -108,27 +108,6 @@ data "aws_iam_policy_document" "mwaa" {
     ]
   }
 
-  statement {
-    effect = "Allow"
-    actions = [
-      "kms:Decrypt",
-      "kms:DescribeKey",
-      "kms:GenerateDataKey*",
-      "kms:Encrypt"
-    ]
-    not_resources = [
-      "arn:${data.aws_partition.current.id}:kms:*:${data.aws_caller_identity.current.account_id}:key/*"
-    ]
-    condition {
-      test     = "StringLike"
-      variable = "kms:ViaService"
-
-      values = [
-        "sqs.${data.aws_region.current.name}.amazonaws.com"
-      ]
-    }
-  }
-
   dynamic "statement" {
     for_each = var.kms_key != null ? [] : [1]
     content {
