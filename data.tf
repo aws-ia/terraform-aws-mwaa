@@ -124,7 +124,7 @@ data "aws_iam_policy_document" "mwaa" {
       condition {
         test     = "StringLike"
         variable = "kms:ViaService"
-  
+
         values = [
           "sqs.${data.aws_region.current.name}.amazonaws.com"
         ]
@@ -148,7 +148,7 @@ data "aws_iam_policy_document" "mwaa" {
       condition {
         test     = "StringLike"
         variable = "kms:ViaService"
-  
+
         values = [
           "sqs.${data.aws_region.current.name}.amazonaws.com"
         ]
