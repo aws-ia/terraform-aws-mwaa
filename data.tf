@@ -143,7 +143,7 @@ data "aws_iam_policy_document" "mwaa" {
         "kms:Encrypt"
       ]
       resources = [
-        var.var.kms_key
+        var.kms_key
       ]
       condition {
         test     = "StringLike"
