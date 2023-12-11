@@ -35,7 +35,7 @@ module "mwaa" {
   max_workers           = 25
   webserver_access_mode = "PUBLIC_ONLY" # Default PRIVATE_ONLY for production environments
 
-  input_iam_role_additional_policies = {
+  iam_role_additional_policies = {
     "additional-policy-1" = "<ENTER_POLICY_ARN1>"
     "additional-policy-2" = "<ENTER_POLICY_ARN2>"
   }
