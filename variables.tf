@@ -157,6 +157,12 @@ variable "iam_role_name" {
   default     = null
 }
 
+variable "additional_principal_arns" {
+  description = "List of additional AWS principal ARNs"
+  type        = list(string)
+  default     = []
+}
+
 variable "iam_role_permissions_boundary" {
   description = "IAM role Permission boundary"
   type        = string
