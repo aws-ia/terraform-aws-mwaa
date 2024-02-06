@@ -105,8 +105,10 @@ resource "aws_iam_role_policy_attachment" "mwaa" {
 resource "aws_s3_bucket" "mwaa" {
   count = var.create_s3_bucket ? 1 : 0
 
-  bucket_prefix = var.source_bucket_name != null ? var.source_bucket_name : format("%s-%s-", "mwaa", data.aws_caller_identity.current.account_id)
-  tags          = var.tags
+  bucket        = local.source_bucket_name
+  bucket_prefix = local.source_bucket_prefix
+
+  tags = var.tags
 }
 
 #tfsec:ignore:aws-s3-encryption-customer-key
