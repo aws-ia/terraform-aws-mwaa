@@ -105,7 +105,7 @@ resource "aws_iam_role_policy_attachment" "mwaa" {
 resource "aws_s3_bucket" "mwaa" {
   count = var.create_s3_bucket ? 1 : 0
 
-  name          = local.source_bucket_name
+  bucket        = local.source_bucket_name
   bucket_prefix = local.source_bucket_prefix
 
   tags = var.tags

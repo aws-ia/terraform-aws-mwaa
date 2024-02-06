@@ -7,7 +7,7 @@ locals {
 
   source_bucket_prefix = var.source_bucket_name == null ? format("%s-%s-", "mwaa", data.aws_caller_identity.current.account_id) : (var.use_source_bucket_name_as_prefix ? var.source_bucket_name : null)
 
-  source_bucket_name = local.source_bucket_prefix != null ? null : var.var.source_bucket_name
+  source_bucket_name = local.source_bucket_prefix != null ? null : var.source_bucket_name
 
   default_airflow_configuration_options = {
     "logging.logging_level" = "INFO"
