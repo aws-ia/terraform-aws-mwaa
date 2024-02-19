@@ -55,7 +55,9 @@ data "aws_iam_policy_document" "mwaa" {
   statement {
     effect = "Allow"
     actions = [
-      "s3:*"
+      "s3:GetObject*",
+      "s3:GetBucket*",
+      "s3:List*"
     ]
     resources = [
       local.source_bucket_arn,
@@ -84,9 +86,7 @@ data "aws_iam_policy_document" "mwaa" {
     actions = [
       "logs:DescribeLogGroups",
       "cloudwatch:PutMetricData",
-      "batch:DescribeJobs",
-      "batch:ListJobs",
-      "eks:*"
+      "s3:GetAccountPublicAccessBlock"
     ]
     resources = [
       "*"
@@ -108,6 +108,10 @@ data "aws_iam_policy_document" "mwaa" {
     ]
   }
 
+  # See note in https://docs.aws.amazon.com/mwaa/latest/userguide/mwaa-create-role.html
+  # if MWAA is using a AWS managed KMS key, we have to give permission to the key in ?? account
+  # We don't know what account AWS puts their key in so we use not_resources to grant access to all
+  # accounts except for ours
   dynamic "statement" {
     for_each = var.kms_key != null ? [] : [1]
     content {
