@@ -112,24 +112,51 @@ data "aws_iam_policy_document" "mwaa" {
   # if MWAA is using a AWS managed KMS key, we have to give permission to the key in ?? account
   # We don't know what account AWS puts their key in so we use not_resources to grant access to all
   # accounts except for ours
-  statement {
-    effect = "Allow"
-    actions = [
-      "kms:Decrypt",
-      "kms:DescribeKey",
-      "kms:GenerateDataKey*",
-      "kms:Encrypt"
-    ]
-    not_resources = [
-      "arn:${data.aws_partition.current.id}:kms:*:${data.aws_caller_identity.current.account_id}:key/*"
-    ]
-    condition {
-      test     = "StringLike"
-      variable = "kms:ViaService"
-
-      values = [
-        "sqs.${data.aws_region.current.name}.amazonaws.com"
+  dynamic "statement" {
+    for_each = var.kms_key != null ? [] : [1]
+    content {
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey*",
+        "kms:Encrypt"
       ]
+      not_resources = [
+        "arn:${data.aws_partition.current.id}:kms:*:${data.aws_caller_identity.current.account_id}:key/*"
+      ]
+      condition {
+        test     = "StringLike"
+        variable = "kms:ViaService"
+
+        values = [
+          "sqs.${data.aws_region.current.name}.amazonaws.com"
+        ]
+      }
+    }
+  }
+
+  dynamic "statement" {
+    for_each = var.kms_key != null ? [1] : []
+    content {
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey*",
+        "kms:Encrypt"
+      ]
+      resources = [
+        var.kms_key
+      ]
+      condition {
+        test     = "StringLike"
+        variable = "kms:ViaService"
+
+        values = [
+          "sqs.${data.aws_region.current.name}.amazonaws.com"
+        ]
+      }
     }
   }
 
