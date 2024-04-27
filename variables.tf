@@ -31,15 +31,15 @@ variable "dag_s3_path" {
 
 variable "environment_class" {
   description = <<-EOD
-  (Optional) Environment class for the cluster. Possible options are mw1.small, mw1.medium, mw1.large.
+  (Optional) Environment class for the cluster. Possible options are mw1.small, mw1.medium, mw1.large, mw1.xlarge, mw1.2xlarge.
   Will be set by default to mw1.small. Please check the AWS Pricing for more information about the environment classes.
   EOD
   type        = string
   default     = "mw1.small"
 
   validation {
-    condition     = contains(["mw1.small", "mw1.medium", "mw1.large"], var.environment_class)
-    error_message = "Invalid input, options: \"mw1.small\", \"mw1.medium\", \"mw1.large\"."
+    condition     = contains(["mw1.small", "mw1.medium", "mw1.large", "mw1.xlarge", "mw1.2xlarge"], var.environment_class)
+    error_message = "Invalid input, options: \"mw1.small\", \"mw1.medium\", \"mw1.large\", \"mw1.xlarge\", \"mw1.2xlarge\"."
   }
 }
 
@@ -200,11 +200,21 @@ variable "create_s3_bucket" {
 
 variable "source_bucket_name" {
   description = <<-EOD
-  New bucket will be created with the given name for MWAA when create_s3_bucket=true
+  New bucket will be created with the given name for MWAA when create_s3_bucket=true.
+  If set to null, then the default bucket name prefix will be set, irrespective of the value of `var.use_source_bucket_name_as_prefix`
   EOD
   type        = string
   default     = null
 }
+
+variable "use_source_bucket_name_as_prefix" {
+  description = <<-EOD
+  Whether or not to use the `var.source_bucket_name` as the S3 bucket name prefix
+  EOD
+  type        = bool
+  default     = true
+}
+
 
 variable "source_bucket_arn" {
   description = "(Required) The Amazon Resource Name (ARN) of your Amazon S3 storage bucket. For example, arn:aws:s3:::airflow-mybucketname"
