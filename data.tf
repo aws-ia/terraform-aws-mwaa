@@ -38,6 +38,13 @@ data "aws_iam_policy_document" "mwaa_assume" {
       type        = "Service"
       identifiers = ["s3.amazonaws.com"]
     }
+    dynamic "principals" {
+      for_each = var.additional_principal_arns
+      content {
+        type        = "AWS"
+        identifiers = [principals.value]
+      }
+    }
   }
 }
 #tfsec:ignore:AWS099
