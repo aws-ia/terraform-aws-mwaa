@@ -23,6 +23,7 @@ resource "aws_mwaa_environment" "mwaa" {
   source_bucket_arn               = local.source_bucket_arn
   webserver_access_mode           = var.webserver_access_mode
   weekly_maintenance_window_start = var.weekly_maintenance_window_start
+  endpoint_management             = var.endpoint_management
 
   tags = var.tags
 
