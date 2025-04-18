@@ -1,3 +1,8 @@
+output "mwaa_webserver_vpc_endpoint_service" {
+  description = "The VPC endpoint for the environment's web server"
+  value       = aws_mwaa_environment.mwaa.webserver_vpc_endpoint_service
+}
+
 output "mwaa_webserver_url" {
   description = "The webserver URL of the MWAA Environment"
   value       = aws_mwaa_environment.mwaa.webserver_url
