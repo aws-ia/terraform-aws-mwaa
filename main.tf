@@ -57,14 +57,6 @@ resource "aws_mwaa_environment" "mwaa" {
       log_level = try(var.logging_configuration.worker_logs.log_level, "CRITICAL")
     }
   }
-
-  lifecycle {
-    ignore_changes = [
-      plugins_s3_object_version,
-      requirements_s3_object_version,
-      startup_script_s3_object_version
-    ]
-  }
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
