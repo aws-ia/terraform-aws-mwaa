@@ -44,3 +44,4 @@ go.sum
 .DS_Store
 .idea
 .build
+.zed
