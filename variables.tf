@@ -31,15 +31,15 @@ variable "dag_s3_path" {
 
 variable "environment_class" {
   description = <<-EOD
-  (Optional) Environment class for the cluster. Possible options are mw1.small, mw1.medium, mw1.large, mw1.xlarge, mw1.2xlarge.
-  Will be set by default to mw1.small. Please check the AWS Pricing for more information about the environment classes.
+  (Optional) Environment class for the cluster. Possible options are mw1.micro, mw1.small, mw1.medium, mw1.large, mw1.xlarge, mw1.2xlarge.
+  Will be set by default to mw1.micro. Please check the AWS Pricing for more information about the environment classes.
   EOD
   type        = string
-  default     = "mw1.small"
+  default     = "mw1.micro"
 
   validation {
-    condition     = contains(["mw1.small", "mw1.medium", "mw1.large", "mw1.xlarge", "mw1.2xlarge"], var.environment_class)
-    error_message = "Invalid input, options: \"mw1.small\", \"mw1.medium\", \"mw1.large\", \"mw1.xlarge\", \"mw1.2xlarge\"."
+    condition     = contains(["mw1.micro", "mw1.small", "mw1.medium", "mw1.large", "mw1.xlarge", "mw1.2xlarge"], var.environment_class)
+    error_message = "Invalid input, options: \"mw1.micro\", \"mw1.small\", \"mw1.medium\", \"mw1.large\", \"mw1.xlarge\", \"mw1.2xlarge\"."
   }
 }
 
