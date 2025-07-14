@@ -137,6 +137,17 @@ variable "weekly_maintenance_window_start" {
   default     = null
 }
 
+variable "endpoint_management" {
+  description = "(Optional) Specifies who is responsible for creating the VPC endpoints for environment. CUSTOMER is useful when your VPC is owned by another account. Possible options: SERVICE (default) and CUSTOMER"
+  type        = string
+  default     = "SERVICE"
+
+  validation {
+    condition     = contains(["SERVICE", "CUSTOMER"], var.endpoint_management)
+    error_message = "Invalid input, options: \"SERVICE\", \"CUSTOMER\"."
+  }
+}
+
 variable "tags" {
   description = "(Optional) A map of resource tags to associate with the resource"
   type        = map(string)
