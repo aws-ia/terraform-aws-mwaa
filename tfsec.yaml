@@ -3,3 +3,7 @@ exclude:
   - aws-vpc-no-excessive-port-access # VPC settings left up to user implementation for recommended practices
   - aws-vpc-no-public-ingress-acl # VPC settings left up to user implementation for recommended practices
   - aws-vpc-no-public-egress-sgr # Added in v1.22
+  - aws-ec2-no-excessive-port-access # Network ACL rules in VPC module examples
+  - aws-ec2-no-public-ingress-acl # Network ACL rules in VPC module examples
+  - aws-s3-encryption-customer-key # Example uses AWS managed keys for simplicity
+  - aws-ec2-require-vpc-flow-logs-for-all-vpcs # VPC flow logs not required for examples

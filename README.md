@@ -91,13 +91,13 @@ Apache-2.0 Licensed. See [LICENSE](https://github.com/aws-ia/terraform-aws-mwaa/
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.39.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.11.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.39.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.11.0 |
 
 ## Modules
 
@@ -168,6 +168,7 @@ No modules.
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | (Required) VPC ID to deploy the MWAA Environment.<br/>Mandatory if `create_security_group=true` | `string` | `""` | no |
 | <a name="input_webserver_access_mode"></a> [webserver\_access\_mode](#input\_webserver\_access\_mode) | (Optional) Specifies whether the webserver should be accessible over the internet or via your specified VPC. Possible options: PRIVATE\_ONLY (default) and PUBLIC\_ONLY | `string` | `"PRIVATE_ONLY"` | no |
 | <a name="input_weekly_maintenance_window_start"></a> [weekly\_maintenance\_window\_start](#input\_weekly\_maintenance\_window\_start) | (Optional) Specifies the start date for the weekly maintenance window | `string` | `null` | no |
+| <a name="input_worker_replacement_strategy"></a> [worker\_replacement\_strategy](#input\_worker\_replacement\_strategy) | (Optional) The worker replacement strategy to use for your environment. Possible options: FORCED (default) and GRACEFUL | `string` | `"FORCED"` | no |
 
 ## Outputs
 

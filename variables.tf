@@ -78,6 +78,17 @@ variable "min_workers" {
   default     = 1
 }
 
+variable "worker_replacement_strategy" {
+  description = "(Optional) The worker replacement strategy to use for your environment. Possible options: FORCED (default) and GRACEFUL"
+  type        = string
+  default     = "FORCED"
+
+  validation {
+    condition     = contains(["FORCED", "GRACEFUL"], var.worker_replacement_strategy)
+    error_message = "Invalid input, options: \"FORCED\", \"GRACEFUL\"."
+  }
+}
+
 variable "plugins_s3_object_version" {
   description = "(Optional) The plugins.zip file version you want to use."
   type        = string
@@ -151,8 +162,8 @@ variable "max_webservers" {
   type        = number
   default     = 2
   validation {
-    condition     = (var.max_webservers >= 2 && var.min_webservers <= 5) && (var.max_webservers >= var.min_webservers)
-    error_message = "Error: Value need to be more or equal to `min_webservers` value and be between 2 and 5."
+    condition     = var.max_webservers >= 2 && var.max_webservers <= 5
+    error_message = "Error: max_webservers must be between 2 and 5."
   }
 }
 

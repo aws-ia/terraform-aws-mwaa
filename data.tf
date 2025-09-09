@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "mwaa" {
       "airflow:CreateWebLoginToken"
     ]
     resources = [
-      "arn:${data.aws_partition.current.id}:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:environment/${var.name}"
+      "arn:${data.aws_partition.current.id}:airflow:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:environment/${var.name}"
     ]
   }
   statement {
@@ -84,7 +84,7 @@ data "aws_iam_policy_document" "mwaa" {
       "logs:GetQueryResults"
     ]
     resources = [
-      "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:airflow-${var.name}-*"
+      "arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:airflow-${var.name}-*"
     ]
   }
 
@@ -112,7 +112,7 @@ data "aws_iam_policy_document" "mwaa" {
       "sqs:SendMessage"
     ]
     resources = [
-      "arn:${data.aws_partition.current.id}:sqs:${data.aws_region.current.name}:*:airflow-celery-*"
+      "arn:${data.aws_partition.current.id}:sqs:${data.aws_region.current.id}:*:airflow-celery-*"
     ]
   }
 
@@ -138,7 +138,7 @@ data "aws_iam_policy_document" "mwaa" {
         variable = "kms:ViaService"
 
         values = [
-          "sqs.${data.aws_region.current.name}.amazonaws.com"
+          "sqs.${data.aws_region.current.id}.amazonaws.com"
         ]
       }
     }
@@ -162,7 +162,7 @@ data "aws_iam_policy_document" "mwaa" {
         variable = "kms:ViaService"
 
         values = [
-          "sqs.${data.aws_region.current.name}.amazonaws.com"
+          "sqs.${data.aws_region.current.id}.amazonaws.com"
         ]
       }
     }
@@ -184,7 +184,7 @@ data "aws_iam_policy_document" "mwaa" {
       "ssm:*"
     ]
     resources = [
-      "arn:${data.aws_partition.current.id}:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/*"
+      "arn:${data.aws_partition.current.id}:ssm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:parameter/*"
     ]
   }
 
@@ -193,12 +193,12 @@ data "aws_iam_policy_document" "mwaa" {
     actions = [
       "logs:*"
     ]
-    resources = ["arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/*"]
+    resources = ["arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/*"]
   }
 
   statement {
     effect    = "Allow"
     actions   = ["cloudwatch:*"]
-    resources = ["arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/*"]
+    resources = ["arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/*"]
   }
 }
