@@ -5,8 +5,8 @@ resource "aws_mwaa_environment" "mwaa" {
   name              = var.name
   airflow_version   = var.airflow_version
   environment_class = var.environment_class
-  min_workers       = var.min_workers
-  max_workers       = var.max_workers
+  min_workers       = var.environment_class != "mw1.micro" ? var.min_workers : 1
+  max_workers       = var.environment_class != "mw1.micro" ? var.max_workers : 1
   kms_key           = var.kms_key
 
   dag_s3_path                      = var.dag_s3_path
@@ -16,14 +16,14 @@ resource "aws_mwaa_environment" "mwaa" {
   requirements_s3_object_version   = var.requirements_s3_object_version
   startup_script_s3_path           = var.startup_script_s3_path
   startup_script_s3_object_version = var.startup_script_s3_object_version
-  schedulers                       = var.schedulers
+  schedulers                       = var.environment_class != "mw1.micro" ? var.schedulers : 1
   execution_role_arn               = local.execution_role_arn
   airflow_configuration_options    = local.airflow_configuration_options
 
   source_bucket_arn     = local.source_bucket_arn
   webserver_access_mode = var.webserver_access_mode
-  min_webservers        = var.min_webservers
-  max_webservers        = var.max_webservers
+  min_webservers        = var.environment_class != "mw1.micro" ? var.min_webservers : 1
+  max_webservers        = var.environment_class != "mw1.micro" ? var.max_webservers : 1
 
   weekly_maintenance_window_start = var.weekly_maintenance_window_start
   endpoint_management             = var.endpoint_management
