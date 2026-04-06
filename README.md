@@ -77,6 +77,36 @@ module "mwaa" {
 }
 ```
 
+## Environment Class Constraints
+
+The `mw1.micro` environment class has fixed capacity constraints that differ from other classes:
+
+| Parameter | mw1.micro | mw1.small and above |
+|-----------|-----------|---------------------|
+| `schedulers` | Must be `1` | `2` to `5` |
+| `min_webservers` | Must be `1` | `2` to `5` |
+| `max_webservers` | Must be `1` | `2` to `5` |
+| `min_workers` | Must be `1` | `1` to `25` |
+| `max_workers` | Must be `1` | `1` to `25` |
+
+When using `mw1.micro`, you must explicitly set these values to `1`:
+
+```hcl
+module "mwaa" {
+  source = "aws-ia/mwaa/aws"
+
+  environment_class = "mw1.micro"
+  schedulers        = 1
+  min_webservers    = 1
+  max_webservers    = 1
+  min_workers       = 1
+  max_workers       = 1
+  # ...
+}
+```
+
+For more details, see the [AWS MWAA environment class documentation](https://docs.aws.amazon.com/mwaa/latest/userguide/environment-class.html).
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
@@ -90,7 +120,7 @@ Apache-2.0 Licensed. See [LICENSE](https://github.com/aws-ia/terraform-aws-mwaa/
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.39.0 |
 
 ## Providers
@@ -137,7 +167,7 @@ No modules.
 | <a name="input_create_security_group"></a> [create\_security\_group](#input\_create\_security\_group) | Create security group for MWAA | `bool` | `true` | no |
 | <a name="input_dag_s3_path"></a> [dag\_s3\_path](#input\_dag\_s3\_path) | (Required) The relative path to the DAG folder on your Amazon S3 storage bucket. For example, dags. | `string` | `"dags"` | no |
 | <a name="input_endpoint_management"></a> [endpoint\_management](#input\_endpoint\_management) | (Optional) Specifies who is responsible for creating the VPC endpoints for environment. CUSTOMER is useful when your VPC is owned by another account. Possible options: SERVICE (default) and CUSTOMER | `string` | `"SERVICE"` | no |
-| <a name="input_environment_class"></a> [environment\_class](#input\_environment\_class) | (Optional) Environment class for the cluster. Possible options are mw1.micro, mw1.small, mw1.medium, mw1.large, mw1.xlarge, mw1.2xlarge.<br/>Will be set by default to mw1.micro. Please check the AWS Pricing for more information about the environment classes. | `string` | `"mw1.micro"` | no |
+| <a name="input_environment_class"></a> [environment\_class](#input\_environment\_class) | (Optional) Environment class for the cluster. Possible options are mw1.micro, mw1.small, mw1.medium, mw1.large, mw1.xlarge, mw1.2xlarge.<br/>Will be set by default to mw1.small. Please check the AWS Pricing for more information about the environment classes.<br/>Note: mw1.micro has fixed capacity constraints — schedulers, webservers, and workers must all be set to 1. | `string` | `"mw1.small"` | no |
 | <a name="input_execution_role_arn"></a> [execution\_role\_arn](#input\_execution\_role\_arn) | (Required) The Amazon Resource Name (ARN) of the task execution role that the Amazon MWAA and its environment can assume<br/>Mandatory if `create_iam_role=false` | `string` | `null` | no |
 | <a name="input_force_detach_policies"></a> [force\_detach\_policies](#input\_force\_detach\_policies) | IAM role Force detach policies | `bool` | `false` | no |
 | <a name="input_iam_role_additional_policies"></a> [iam\_role\_additional\_policies](#input\_iam\_role\_additional\_policies) | Additional policies to be added to the IAM role | `map(string)` | `{}` | no |

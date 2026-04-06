@@ -32,10 +32,11 @@ variable "dag_s3_path" {
 variable "environment_class" {
   description = <<-EOD
   (Optional) Environment class for the cluster. Possible options are mw1.micro, mw1.small, mw1.medium, mw1.large, mw1.xlarge, mw1.2xlarge.
-  Will be set by default to mw1.micro. Please check the AWS Pricing for more information about the environment classes.
+  Will be set by default to mw1.small. Please check the AWS Pricing for more information about the environment classes.
+  Note: mw1.micro has fixed capacity constraints — schedulers, webservers, and workers must all be set to 1.
   EOD
   type        = string
-  default     = "mw1.micro"
+  default     = "mw1.small"
 
   validation {
     condition     = contains(["mw1.micro", "mw1.small", "mw1.medium", "mw1.large", "mw1.xlarge", "mw1.2xlarge"], var.environment_class)
@@ -61,21 +62,38 @@ variable "logging_configuration" {
 variable "max_workers" {
   description = <<-EOD
   (Optional) The maximum number of workers that can be automatically scaled up.
-  Value need to be between 1 and 25. Will be 10 by default
+  Value need to be between 1 and 25. Will be 10 by default.
+  For mw1.micro environment class, this value must be 1.
   EOD
   type        = number
   default     = 10
 
   validation {
-    condition     = var.max_workers > 0 && var.max_workers < 26
-    error_message = "Error: Value need to be between 1 and 25."
+    condition = (
+      var.environment_class == "mw1.micro"
+      ? var.max_workers == 1
+      : var.max_workers >= 1 && var.max_workers <= 25 && var.max_workers >= var.min_workers
+    )
+    error_message = "Error: For mw1.micro, max_workers must be 1. For other environment classes, value must be between 1 and 25 and >= min_workers."
   }
 }
 
 variable "min_workers" {
-  description = "(Optional) The minimum number of workers that you want to run in your environment. Will be 1 by default."
+  description = <<-EOD
+  (Optional) The minimum number of workers that you want to run in your environment. Will be 1 by default.
+  For mw1.micro environment class, this value must be 1.
+  EOD
   type        = number
   default     = 1
+
+  validation {
+    condition = (
+      var.environment_class == "mw1.micro"
+      ? var.min_workers == 1
+      : var.min_workers >= 1 && var.min_workers <= 25
+    )
+    error_message = "Error: For mw1.micro, min_workers must be 1. For other environment classes, value must be between 1 and 25."
+  }
 }
 
 variable "plugins_s3_object_version" {
@@ -115,14 +133,21 @@ variable "startup_script_s3_path" {
 }
 
 variable "schedulers" {
-  description = "(Optional) The number of schedulers that you want to run in your environment."
+  description = <<-EOD
+  (Optional) The number of schedulers that you want to run in your environment.
+  For mw1.micro environment class, this value must be 1. For other classes, value must be between 2 and 5.
+  EOD
   type        = number
   default     = 2
-  validation {
-    condition     = var.schedulers >= 2 && var.schedulers <= 5
-    error_message = "Error: Value need to be between 2 and 5."
-  }
 
+  validation {
+    condition = (
+      var.environment_class == "mw1.micro"
+      ? var.schedulers == 1
+      : var.schedulers >= 2 && var.schedulers <= 5
+    )
+    error_message = "Error: For mw1.micro, schedulers must be 1. For other environment classes, value must be between 2 and 5."
+  }
 }
 
 variable "webserver_access_mode" {
@@ -137,22 +162,38 @@ variable "webserver_access_mode" {
 }
 
 variable "min_webservers" {
-  description = "(Optional) The minimum number of webserver instances that you want to run in your environment."
+  description = <<-EOD
+  (Optional) The minimum number of webserver instances that you want to run in your environment.
+  For mw1.micro environment class, this value must be 1. For other classes, value must be between 2 and 5.
+  EOD
   type        = number
   default     = 2
+
   validation {
-    condition     = var.min_webservers >= 2 && var.min_webservers <= 5
-    error_message = "Error: Value need to be between 2 and 5."
+    condition = (
+      var.environment_class == "mw1.micro"
+      ? var.min_webservers == 1
+      : var.min_webservers >= 2 && var.min_webservers <= 5
+    )
+    error_message = "Error: For mw1.micro, min_webservers must be 1. For other environment classes, value must be between 2 and 5."
   }
 }
 
 variable "max_webservers" {
-  description = "(Optional) The maximum number of webserver instances that you want to run in your environment."
+  description = <<-EOD
+  (Optional) The maximum number of webserver instances that you want to run in your environment.
+  For mw1.micro environment class, this value must be 1. For other classes, value must be between 2 and 5.
+  EOD
   type        = number
   default     = 2
+
   validation {
-    condition     = (var.max_webservers >= 2 && var.min_webservers <= 5) && (var.max_webservers >= var.min_webservers)
-    error_message = "Error: Value need to be more or equal to `min_webservers` value and be between 2 and 5."
+    condition = (
+      var.environment_class == "mw1.micro"
+      ? var.max_webservers == 1
+      : (var.max_webservers >= 2 && var.max_webservers <= 5) && (var.max_webservers >= var.min_webservers)
+    )
+    error_message = "Error: For mw1.micro, max_webservers must be 1. For other environment classes, value must be between 2 and 5 and >= min_webservers."
   }
 }
 
