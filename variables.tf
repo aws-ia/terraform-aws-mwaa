@@ -151,8 +151,15 @@ variable "max_webservers" {
   type        = number
   default     = 2
   validation {
-    condition     = (var.max_webservers >= 2 && var.min_webservers <= 5) && (var.max_webservers >= var.min_webservers)
-    error_message = "Error: Value need to be more or equal to `min_webservers` value and be between 2 and 5."
+    condition     = (var.max_webservers >= 2 && var.max_webservers <= 5)
+    error_message = "Error: Value need to be between 2 and 5."
+  }
+}
+
+check "max_webservers_gte_min_webservers" {
+  assert {
+    condition     = var.max_webservers >= var.min_webservers
+    error_message = "max_webservers (${var.max_webservers}) must be greater than or equal to min_webservers (${var.min_webservers})."
   }
 }
 
