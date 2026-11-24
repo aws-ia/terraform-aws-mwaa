@@ -79,7 +79,7 @@ variable "min_workers" {
 }
 
 variable "worker_replacement_strategy" {
-  description = "(Optional) The worker replacement strategy to use when updating the environment. Possible options. FORCED, GRACEFUL.　If not set, the MWAA default is used."
+  description = "(Optional) The worker replacement strategy to use when updating the environment. Possible options. FORCED, GRACEFUL."
   type        = string
   default     = null
 

@@ -168,7 +168,7 @@ No modules.
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | (Required) VPC ID to deploy the MWAA Environment.<br/>Mandatory if `create_security_group=true` | `string` | `""` | no |
 | <a name="input_webserver_access_mode"></a> [webserver\_access\_mode](#input\_webserver\_access\_mode) | (Optional) Specifies whether the webserver should be accessible over the internet or via your specified VPC. Possible options: PRIVATE\_ONLY (default), PUBLIC\_ONLY and PUBLIC\_AND\_PRIVATE | `string` | `"PRIVATE_ONLY"` | no |
 | <a name="input_weekly_maintenance_window_start"></a> [weekly\_maintenance\_window\_start](#input\_weekly\_maintenance\_window\_start) | (Optional) Specifies the start date for the weekly maintenance window | `string` | `null` | no |
-| <a name="input_worker_replacement_strategy"></a> [worker\_replacement\_strategy](#input\_worker\_replacement\_strategy) | (Optional) The worker replacement strategy to use when updating the environment. Possible options. FORCED, GRACEFUL.　If not set, the MWAA default is used. | `string` | `null` | no |
+| <a name="input_worker_replacement_strategy"></a> [worker\_replacement\_strategy](#input\_worker\_replacement\_strategy) | (Optional) The worker replacement strategy to use when updating the environment. Possible options. FORCED, GRACEFUL. | `string` | `null` | no |
 
 ## Outputs
 
