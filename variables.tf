@@ -78,6 +78,17 @@ variable "min_workers" {
   default     = 1
 }
 
+variable "worker_replacement_strategy" {
+  description = "(Optional) The worker replacement strategy to use when updating the environment. Possible options. FORCED, GRACEFUL.　If not set, the MWAA default is used."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.worker_replacement_strategy == null || contains(["FORCED", "GRACEFUL"], var.worker_replacement_strategy)
+    error_message = "Invalid input, options: \"FORCED\", \"GRACEFUL\"."
+  }
+}
+
 variable "plugins_s3_object_version" {
   description = "(Optional) The plugins.zip file version you want to use."
   type        = string

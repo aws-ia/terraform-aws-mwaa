@@ -19,6 +19,7 @@ resource "aws_mwaa_environment" "mwaa" {
   schedulers                       = var.schedulers
   execution_role_arn               = local.execution_role_arn
   airflow_configuration_options    = local.airflow_configuration_options
+  worker_replacement_strategy      = var.worker_replacement_strategy
 
   source_bucket_arn     = local.source_bucket_arn
   webserver_access_mode = var.webserver_access_mode
