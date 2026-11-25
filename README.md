@@ -176,6 +176,7 @@ No modules.
 | ---- | ----------- |
 | <a name="output_aws_s3_bucket_name"></a> [aws\_s3\_bucket\_name](#output\_aws\_s3\_bucket\_name) | S3 bucket Name of the MWAA Environment |
 | <a name="output_mwaa_arn"></a> [mwaa\_arn](#output\_mwaa\_arn) | The ARN of the MWAA Environment |
+| <a name="output_mwaa_database_vpc_endpoint_service"></a> [mwaa\_database\_vpc\_endpoint\_service](#output\_mwaa\_database\_vpc\_endpoint\_service) | The VPC endpoint for the environment's Amazon RDS database |
 | <a name="output_mwaa_role_arn"></a> [mwaa\_role\_arn](#output\_mwaa\_role\_arn) | IAM Role ARN of the MWAA Environment |
 | <a name="output_mwaa_role_name"></a> [mwaa\_role\_name](#output\_mwaa\_role\_name) | IAM role name of the MWAA Environment |
 | <a name="output_mwaa_security_group_id"></a> [mwaa\_security\_group\_id](#output\_mwaa\_security\_group\_id) | Security group id of the MWAA Environment |

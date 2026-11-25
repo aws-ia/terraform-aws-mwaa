@@ -3,6 +3,11 @@ output "mwaa_webserver_url" {
   value       = module.mwaa.mwaa_webserver_url
 }
 
+output "mwaa_database_vpc_endpoint_service" {
+  description = "The VPC endpoint for the environment's Amazon RDS database"
+  value       = module.mwaa.mwaa_database_vpc_endpoint_service
+}
+
 output "mwaa_arn" {
   description = "The ARN of the MWAA Environment"
   value       = module.mwaa.mwaa_arn
