@@ -147,7 +147,7 @@ No modules.
 | <a name="input_kms_key"></a> [kms\_key](#input\_kms\_key) | (Optional) The Amazon Resource Name (ARN) of your KMS key that you want to use for encryption.<br/>Will be set to the ARN of the managed KMS key aws/airflow by default. | `string` | `null` | no |
 | <a name="input_logging_configuration"></a> [logging\_configuration](#input\_logging\_configuration) | (Optional) The Apache Airflow logs which will be send to Amazon CloudWatch Logs. | `any` | `null` | no |
 | <a name="input_max_webservers"></a> [max\_webservers](#input\_max\_webservers) | (Optional) The maximum number of webserver instances that you want to run in your environment. | `number` | `2` | no |
-| <a name="input_max_workers"></a> [max\_workers](#input\_max\_workers) | (Optional) The maximum number of workers that can be automatically scaled up.<br/>Value need to be between 1 and 25. Will be 10 by default | `number` | `10` | no |
+| <a name="input_max_workers"></a> [max\_workers](#input\_max\_workers) | (Optional) The maximum number of workers that can be automatically scaled up.<br/>Value need to be between 1 and 50. Will be 10 by default | `number` | `10` | no |
 | <a name="input_min_webservers"></a> [min\_webservers](#input\_min\_webservers) | (Optional) The minimum number of webserver instances that you want to run in your environment. | `number` | `2` | no |
 | <a name="input_min_workers"></a> [min\_workers](#input\_min\_workers) | (Optional) The minimum number of workers that you want to run in your environment. Will be 1 by default. | `number` | `1` | no |
 | <a name="input_name"></a> [name](#input\_name) | (Required) The name of the Apache Airflow MWAA Environment | `string` | n/a | yes |

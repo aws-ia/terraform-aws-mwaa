@@ -61,14 +61,14 @@ variable "logging_configuration" {
 variable "max_workers" {
   description = <<-EOD
   (Optional) The maximum number of workers that can be automatically scaled up.
-  Value need to be between 1 and 25. Will be 10 by default
+  Value need to be between 1 and 50. Will be 10 by default
   EOD
   type        = number
   default     = 10
 
   validation {
-    condition     = var.max_workers > 0 && var.max_workers < 26
-    error_message = "Error: Value need to be between 1 and 25."
+    condition     = var.max_workers > 0 && var.max_workers <= 50
+    error_message = "Error: Value need to be between 1 and 50."
   }
 }
 
